@@ -12,12 +12,12 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // This is used to hide the status bar and make
+        /*// This is used to hide the status bar and make
         // the splash screen as a full screen activity.
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+        )*/
 
         // Handler().postDelayed({
         Handler(Looper.getMainLooper()).postDelayed({
