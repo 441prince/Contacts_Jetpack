@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="AddNewContactViewModel"
+            type="com.prince.contacts.viewmodel.AddNewContactViewModel" />
+    </data>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:orientation="vertical"
+        tools:context=".view.AddNewContactActivity">
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/selectContactImage"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerVertical="true"
+            app:civ_border_color="@color/blue"
+            app:civ_border_width="2dp"
+            android:src="@drawable/contactblack" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Click to Add Image" />
+
+        <EditText
+            android:id="@+id/editTextText"
+            android:layout_marginTop="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="@={AddNewContactViewModel.inputName}"
+            android:hint="Enter Name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextPhone"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="@={AddNewContactViewModel.inputPhoneNumber}"
+            android:hint="Enter Phone Number"
+            android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/editTextTextEmailAddress"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="@={AddNewContactViewModel.inputEmailId}"
+            android:hint="Enter Email Id"
+            android:inputType="textEmailAddress" />
+
+        <Button
+            android:id="@+id/AddContactSubmitButton"
+            android:layout_marginTop="80dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->AddNewContactViewModel.addContact()}"
+            android:textSize="20dp"
+            android:text="Submit" />
+
+    </LinearLayout>
+</layout>

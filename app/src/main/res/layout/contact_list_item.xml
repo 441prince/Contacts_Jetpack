@@ -12,14 +12,17 @@
         android:orientation="horizontal"
         android:padding="5dp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contact_imageview"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            app:civ_border_color="@color/blue"
+            app:civ_border_width="2dp"
             android:src="@drawable/contacts" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -51,10 +54,13 @@
 
         <ImageButton
             android:id="@+id/contact_favorite_imageview"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
+            android:layout_weight="1"
             android:scaleType="fitCenter"
+            android:background="@color/white"
+            android:adjustViewBounds="true"
             android:src="@drawable/filledheart" />
 
     </LinearLayout>

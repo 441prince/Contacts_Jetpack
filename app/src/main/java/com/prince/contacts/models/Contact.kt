@@ -1,5 +1,15 @@
 package com.prince.contacts.models
 
-data class Contact(val image: Int, val name: String, val number: Number) {
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity
+    (tableName = "contact_table")
+data class Contact(
+    @PrimaryKey @ColumnInfo(name = "contactNumber") val phoneNumber : String,
+    @ColumnInfo(name = "contactName") val name: String,
+    @ColumnInfo(name = "contactEmailId") val emailId: String,
+    @ColumnInfo val imageUri: String
+) {
 }

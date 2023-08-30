@@ -1,14 +1,14 @@
 package com.prince.contacts
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.prince.contacts.view.ContactFragment
 import com.prince.contacts.view.FavoriteFragment
 import com.prince.contacts.view.ProfileFragment
+
 
 class MainActivity : AppCompatActivity() {
 
