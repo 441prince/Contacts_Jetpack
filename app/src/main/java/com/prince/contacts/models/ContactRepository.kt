@@ -16,8 +16,12 @@ class ContactRepository(private val contactDao: ContactDao) {
     suspend fun insert(contact: Contact) {
         contactDao.insertContact(contact)
     }
-    val contacts = contactDao.getAllContact()
-    suspend fun insertContact(contact: Contact) {
-        contactDao.insertContact(contact)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun update(contact: Contact) {
+        contactDao.updateContact(contact)
     }
+
+    val contacts = contactDao.getAllContact()
 }

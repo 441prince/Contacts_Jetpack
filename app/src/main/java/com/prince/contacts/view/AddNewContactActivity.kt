@@ -57,8 +57,14 @@ class AddNewContactActivity : AppCompatActivity() {
         val cameraPermission = android.Manifest.permission.CAMERA
         val storagePermission = android.Manifest.permission.READ_EXTERNAL_STORAGE
 
-        val cameraPermissionGranted = ContextCompat.checkSelfPermission(this, cameraPermission) == PackageManager.PERMISSION_GRANTED
-        val storagePermissionGranted = ContextCompat.checkSelfPermission(this, storagePermission) == PackageManager.PERMISSION_GRANTED
+        val cameraPermissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            cameraPermission
+        ) == PackageManager.PERMISSION_GRANTED
+        val storagePermissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            storagePermission
+        ) == PackageManager.PERMISSION_GRANTED
 
         if (!cameraPermissionGranted || !storagePermissionGranted) {
             // Request permissions for both camera and storage if not granted
@@ -69,7 +75,11 @@ class AddNewContactActivity : AppCompatActivity() {
             if (!storagePermissionGranted) {
                 permissionsToRequest.add(storagePermission)
             }
-            ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), PERMISSION_CODE)
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray(),
+                PERMISSION_CODE
+            )
         } else {
             // Both permissions are granted
             openImagePicker()
@@ -126,6 +136,7 @@ class AddNewContactActivity : AppCompatActivity() {
                         }
                     }
                 }
+
                 CAPTURE_IMAGE -> {
                     // Image captured from camera, use the selectedImageUri from the ViewModel
                     addNewContactViewModel.selectedImageUri.value?.let { selectedImageUri ->

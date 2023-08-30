@@ -13,12 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.prince.contacts.R
 import com.prince.contacts.databinding.FragmentContactBinding
 import com.prince.contacts.models.Contact
+import com.prince.contacts.models.ContactDao
 import com.prince.contacts.models.ContactDatabase
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.viewmodel.ContactViewModel
 import com.prince.contacts.viewmodel.ContactViewModelFactory
 
-class ContactFragment : Fragment() {
+class ContactFragment : Fragment(), ContactClickListener {
 
     companion object {
         fun newInstance() = ContactFragment()
@@ -33,13 +34,14 @@ class ContactFragment : Fragment() {
     }*/
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_contact, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_contact, container, false
+        )
         return binding.root
     }
 
@@ -69,7 +71,7 @@ class ContactFragment : Fragment() {
         })
 
         binding.floatingActionButton.setOnClickListener(View.OnClickListener { // Call the ViewModel method to handle the button click
-            viewModel.onButtonClick()
+            viewModel.onPlusButtonClick()
         })
 
         /*// ArrayList of class ItemsViewModel
@@ -84,12 +86,12 @@ class ContactFragment : Fragment() {
         // This will pass the ArrayList to our Adapter
         val adapter = ContactAdapter(data)*/
 
-        initRecyclerView()
+        initRecyclerView(contactDao)
         // Setting the Adapter with the recyclerview
         binding.recyclerview.adapter = adapter
     }
 
-    private fun initRecyclerView() {
+    private fun initRecyclerView(contactDao: ContactDao) {
         binding.recyclerview.layoutManager = LinearLayoutManager(requireContext())
 
         // ArrayList of class ItemsViewModel
@@ -102,17 +104,29 @@ class ContactFragment : Fragment() {
             //viewModel.insertContact(Contact("8902975290", "Name $i " ,R.drawable.contactblack))
         }
 
-        adapter = ContactAdapter(data)
+        adapter = ContactAdapter(data, this, contactDao)
         binding.recyclerview.adapter = adapter
-        displaySubscribersList()
+        displayContactList()
 
     }
 
-    private fun displaySubscribersList() {
+    private fun displayContactList() {
         viewModel.getAllContact().observe(viewLifecycleOwner, Observer {
             adapter.setList(it)
             adapter.notifyDataSetChanged()
         })
+    }
+
+    override fun onContactClick(contact: Contact) {
+
+        // Create an Intent to open the EditContactActivity
+        val intent = Intent(requireContext(), AddNewContactActivity::class.java)
+
+        // Pass the contact data to the EditContactActivity
+        intent.putExtra("contact_phone", contact.phoneNumber)
+
+        // Start the EditContactActivity
+        startActivity(intent)
     }
 
 }

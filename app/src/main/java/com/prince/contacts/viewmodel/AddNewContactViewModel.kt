@@ -1,21 +1,15 @@
 package com.prince.contacts.viewmodel
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Application
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Environment
-import android.provider.MediaStore
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.prince.contacts.R
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactRepository
 import kotlinx.coroutines.launch
@@ -46,7 +40,8 @@ class AddNewContactViewModel (private val application: Application, private val 
                 phoneNumber = inputPhoneNumber.value!!,
                 name = inputName.value!!,
                 emailId = inputEmailId.value!!,
-                imageUri = selectedImageUri.value.toString() // Convert Uri to String
+                imageUri = selectedImageUri.value.toString(), // Convert Uri to String
+                isFavorite = false
             )
 
             insertContact(contact)
