@@ -120,7 +120,7 @@ class ContactFragment : Fragment(), ContactClickListener {
     override fun onContactClick(contact: Contact) {
 
         // Create an Intent to open the EditContactActivity
-        val intent = Intent(requireContext(), AddNewContactActivity::class.java)
+        val intent = Intent(requireContext(), ViewOrEditContactActivity::class.java)
 
         // Pass the contact data to the EditContactActivity
         intent.putExtra("contact_phone", contact.phoneNumber)

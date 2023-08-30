@@ -2,11 +2,11 @@ package com.prince.contacts.viewmodel
 
 import android.app.Activity
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.net.Uri
-import android.widget.Toast
+import android.provider.MediaStore
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,7 +22,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class AddNewContactViewModel(
+class ViewOrEditContactViewModel(
     private val application: Application,
     private val repository: ContactRepository
 ) : ViewModel() {
@@ -31,14 +31,21 @@ class AddNewContactViewModel(
     val inputPhoneNumber = MutableLiveData<String>()
     val inputEmailId = MutableLiveData<String>()
     val navigateToAnotherActivity = MutableLiveData<Boolean>()
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> = _errorMessage
+
+    val displayName = MutableLiveData<String>()
+    val displayPhoneNumber = MutableLiveData<String>()
+    val displayEmailId = MutableLiveData<String>()
+    val displayImageUri: MutableLiveData<String> = MutableLiveData()
 
     private val _selectedImageUri = MutableLiveData<Uri?>()
     val selectedImageUri: LiveData<Uri?> = _selectedImageUri
 
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
+
     private val PICK_IMAGE = 1
     private val CAPTURE_IMAGE = 2
+    private var contactId: Long = 0
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
@@ -49,29 +56,65 @@ class AddNewContactViewModel(
         }
     }
 
-    fun clearErrorMessage() {
-        _errorMessage.value = null
+    private fun updateContact(contact: Contact) = viewModelScope.launch {
+        try {
+            _errorMessage.value = null // Clear any previous error message
+            repository.update(contact)
+        } catch (ex: SQLiteConstraintException) {
+            // Handle the case of a duplicate phone number here
+            _errorMessage.postValue("Phone number already exists.") // Set your error message
+        }
     }
 
-    fun showToast(context: Context, message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    fun deleteContact() = viewModelScope.launch {
+        // Delete the contact using the contactId
+        repository.deleteContactById(contactId)
+
+        // Optionally, navigate back to the previous screen or perform other actions as needed
+        navigateToAnotherActivity.value = true
     }
 
-    fun addContact() {
+
+    fun editOrUpdateButton() {
         if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
+            if (selectedImageUri.value != null) {
+                displayImageUri.value = selectedImageUri.value.toString()
+            }
             val contact = Contact(
-                id = 0,
+                id = contactId,
                 phoneNumber = inputPhoneNumber.value!!,
                 name = inputName.value!!,
                 emailId = inputEmailId.value!!,
-                imageUri = selectedImageUri.value.toString(), // Convert Uri to String
+                imageUri = displayImageUri.value!!, // Convert Uri to String
                 isFavorite = false
             )
-
-            insertContact(contact)
-            // Perform some actions, and then trigger navigation
+            updateContact(contact)
+            Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")
             navigateToAnotherActivity.value = true
+        } else {
+            Log.d("VOECVM editOrUpdateButton() else", "This is a debug message.$contactId")
         }
+    }
+
+    fun displayContact(phoneNumber: String) = viewModelScope.launch {
+        val contact = repository.getContactByPhoneNumber(phoneNumber)
+        // Use 'contact' here
+        if (contact != null) {
+            contactId = contact.id
+            displayName.value = contact.name
+            displayEmailId.value = contact.emailId
+            displayPhoneNumber.value = contact.phoneNumber
+            displayImageUri.value = contact.imageUri
+
+            inputName.value = contact.name
+            inputEmailId.value = contact.emailId
+            inputPhoneNumber.value = contact.phoneNumber
+            displayImageUri.value = contact.imageUri
+
+        } else {
+            // Handle the case where the contact with the provided phone number doesn't exist
+        }
+
     }
 
     fun pickImageFromGallery(activity: Activity) {
@@ -121,11 +164,12 @@ class AddNewContactViewModel(
             // Handle the exception here, you can log it or show an error message
             ex.printStackTrace()
         }
+
     }
 
 
     fun captureImage(activity: Activity) {
-        val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (intent.resolveActivity(activity.packageManager) != null) {
             val photoFile: File? = try {
                 createImageFile()
@@ -165,14 +209,14 @@ class AddNewContactViewModel(
 
 }
 
-class AddNewContactViewModelFactory(
+class ViewOrEditContactViewModelFactory(
     private val application: Application,
     private val repository: ContactRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AddNewContactViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(ViewOrEditContactViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AddNewContactViewModel(application, repository) as T
+            return ViewOrEditContactViewModel(application, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

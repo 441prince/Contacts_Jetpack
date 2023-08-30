@@ -12,14 +12,20 @@ interface ContactDao {
     @Query("SELECT * FROM contact_table ORDER BY contactName ASC")
     fun getAllContact(): Flow<List<Contact>>
 
+    @Query("SELECT * FROM contact_table WHERE contactNumber = :phoneNumber")
+    suspend fun getContactByPhoneNumber(phoneNumber: String): Contact?
+
     @Insert
     suspend fun insertContact(contact: Contact)
+
+    @Update
+    suspend fun updateContact(contact: Contact)
 
     @Delete
     suspend fun deleteContact(contact: Contact)
 
-    @Update
-    suspend fun updateContact(contact: Contact)
+    @Query("DELETE FROM contact_table WHERE contactId = :contactId")
+    suspend fun deleteContactById(contactId: Long)
 
     @Query("DELETE FROM contact_table")
     suspend fun deleteAll()

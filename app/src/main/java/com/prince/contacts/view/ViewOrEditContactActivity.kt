@@ -4,9 +4,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.opengl.Visibility
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
@@ -16,58 +18,92 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.prince.contacts.MainActivity
 import com.prince.contacts.R
-import com.prince.contacts.databinding.ActivityAddNewContactBinding
+import com.prince.contacts.databinding.ActivityViewOrEditContactBinding
 import com.prince.contacts.models.ContactDatabase
 import com.prince.contacts.models.ContactRepository
-import com.prince.contacts.viewmodel.AddNewContactViewModel
-import com.prince.contacts.viewmodel.AddNewContactViewModelFactory
+import com.prince.contacts.viewmodel.ViewOrEditContactViewModel
+import com.prince.contacts.viewmodel.ViewOrEditContactViewModelFactory
 
-class AddNewContactActivity : AppCompatActivity() {
+class ViewOrEditContactActivity : AppCompatActivity() {
 
-    private lateinit var addNewContactViewModel: AddNewContactViewModel
-    private lateinit var binding: ActivityAddNewContactBinding
+    private lateinit var viewOrEditContactViewModel: ViewOrEditContactViewModel
+    private lateinit var binding: ActivityViewOrEditContactBinding
     private val PICK_IMAGE = 1
     private val CAPTURE_IMAGE = 2
+    private var isEditScreen : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_contact)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_view_or_edit_contact)
+
         val dao = ContactDatabase.getDatabase(application).ContactDao()
         val repository = ContactRepository(dao)
-        val factory = AddNewContactViewModelFactory(application, repository)
-        addNewContactViewModel =
-            ViewModelProvider(this, factory).get(AddNewContactViewModel::class.java)
-        binding.addNewContactViewModel = addNewContactViewModel
+        val factory = ViewOrEditContactViewModelFactory(application, repository)
+        viewOrEditContactViewModel =
+            ViewModelProvider(this, factory).get(ViewOrEditContactViewModel::class.java)
+        binding.viewOrEditContactViewModel = viewOrEditContactViewModel
         binding.lifecycleOwner = this
 
+        // In the target activity where you want to retrieve the extra:
+        val extras = intent.extras
+        if (extras != null) {
+            val phoneNumber = extras.getString("contact_phone")
+            isEditScreen = false
+            viewOrEditContactViewModel.displayContact(phoneNumber!!)
+
+        } else {
+            // Handle the case where the extra was not passed or is null.
+        }
+
         // Observe the selectedImageUri LiveData
-        addNewContactViewModel.selectedImageUri.observe(this, Observer { uri ->
+        viewOrEditContactViewModel.displayImageUri.observe(this, Observer { uri ->
             uri?.let {
                 // Display the selected image using an ImageView or load it using Glide
                 Glide.with(this)
                     .load(uri)
                     .centerCrop() // Center-crop the image within the circular frame
-                    .into(binding.selectContactImage)
+                    .into(binding.ViewOrEditContactImage)
             }
         })
 
-        // Set a click listener for yourImageView to open the image picker
-        binding.selectContactImage.setOnClickListener {
-            checkPermissionAndPickImage()
-        }
+        binding.EditOrUpdateContactSubmitButton.setOnClickListener(View.OnClickListener {
+            changeToEditScreen()
+            if(isEditScreen){
+                isEditScreen = false
+                viewOrEditContactViewModel.editOrUpdateButton()
+                //Toast.makeText(this, "isEditScreen $isEditScreen", Toast.LENGTH_LONG).show()
+            } else {
+                isEditScreen = true
+            }
+        })
 
-        addNewContactViewModel.errorMessage.observe(this, Observer { message ->
+        binding.deleteContactSubmitButton.setOnClickListener(View.OnClickListener {
+            viewOrEditContactViewModel.deleteContact()
+        })
+
+
+
+        // Observe the selectedImageUri LiveData
+        viewOrEditContactViewModel.selectedImageUri.observe(this, Observer { uri ->
+            uri?.let {
+                // Display the selected image using an ImageView or load it using Glide
+                Glide.with(this)
+                    .load(uri)
+                    .centerCrop() // Center-crop the image within the circular frame
+                    .into(binding.ViewOrEditContactImage)
+            }
+        })
+
+        viewOrEditContactViewModel.errorMessage.observe(this, Observer { message ->
             if (!message.isNullOrEmpty()) {
                 // Show the error message to the user, e.g., using a Toast or a TextView
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             }
         })
 
-
-
-        addNewContactViewModel.navigateToAnotherActivity.observe(this, Observer { shouldNavigate ->
+        viewOrEditContactViewModel.navigateToAnotherActivity.observe(this, Observer { shouldNavigate ->
             if (shouldNavigate) {
                 // Reset the LiveData value to prevent repeated navigation
-                addNewContactViewModel.navigateToAnotherActivity.value = false
+                viewOrEditContactViewModel.navigateToAnotherActivity.value = false
 
                 // Create an Intent to navigate to another activity
                 val intent = Intent(this, MainActivity::class.java)
@@ -75,7 +111,26 @@ class AddNewContactActivity : AppCompatActivity() {
                 finish()
             }
         })
+    }
 
+    private fun changeToEditScreen () {
+
+        binding.EditOrUpdateContactSubmitButton.visibility = View.VISIBLE
+        binding.ViewOrEditEmailAddressText.visibility = View.VISIBLE
+        binding.ViewOrEditPhoneText.visibility = View.VISIBLE
+        binding.ViewOrEditNameText.visibility = View.VISIBLE
+        binding.textView.visibility = View.VISIBLE
+
+        binding.ViewEmailAddressText.visibility = View.GONE
+        binding.ViewPhoneText.visibility = View.GONE
+        binding.ViewNameText.visibility = View.GONE
+
+        binding.EditOrUpdateContactSubmitButton.text = "Update"
+
+        // Set a click listener for yourImageView to open the image picker
+        binding.ViewOrEditContactImage.setOnClickListener {
+            checkPermissionAndPickImage()
+        }
     }
 
     private fun checkPermissionAndPickImage() {
@@ -136,8 +191,8 @@ class AddNewContactActivity : AppCompatActivity() {
         builder.setTitle("Choose an option")
         builder.setItems(options) { dialog, which ->
             when (which) {
-                0 -> addNewContactViewModel.captureImage(this)
-                1 -> addNewContactViewModel.pickImageFromGallery(this)
+                0 -> viewOrEditContactViewModel.captureImage(this)
+                1 -> viewOrEditContactViewModel.pickImageFromGallery(this)
                 2 -> dialog.dismiss()
             }
         }
@@ -157,17 +212,17 @@ class AddNewContactActivity : AppCompatActivity() {
                         val pickedImageUri = data.data
                         // Copy the picked image to the app's directory
                         if (pickedImageUri != null) {
-                            addNewContactViewModel.copyPickedImageToAppDirectory(pickedImageUri)
+                            viewOrEditContactViewModel.copyPickedImageToAppDirectory(pickedImageUri)
                         }
                     }
                 }
 
                 CAPTURE_IMAGE -> {
                     // Image captured from camera, use the selectedImageUri from the ViewModel
-                    addNewContactViewModel.selectedImageUri.value?.let { selectedImageUri ->
+                    viewOrEditContactViewModel.selectedImageUri.value?.let { selectedImageUri ->
                         // You can use the selectedImageUri to display the captured image
                         // For example, with Glide or setImageURI on an ImageView
-                        binding.selectContactImage.setImageURI(selectedImageUri)
+                        binding.ViewOrEditContactImage.setImageURI(selectedImageUri)
                     }
                 }
             }

@@ -2,15 +2,20 @@ package com.prince.contacts.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity
-    (tableName = "contact_table")
+    (tableName = "contact_table", indices = [Index(value = ["contactNumber"], unique = true)])
 data class Contact(
-    @PrimaryKey @ColumnInfo(name = "contactNumber") val phoneNumber: String,
-    @ColumnInfo(name = "contactName") val name: String,
-    @ColumnInfo(name = "contactEmailId") val emailId: String,
-    @ColumnInfo val imageUri: String,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "contactId")
+    val id: Long, // This field will be auto-generated as a primary key
+
+    @ColumnInfo(name = "contactNumber") var phoneNumber: String,
+    @ColumnInfo(name = "contactName") var name: String,
+    @ColumnInfo(name = "contactEmailId") var emailId: String,
+    @ColumnInfo var imageUri: String,
     @ColumnInfo(name = "isFavorite") var isFavorite: Boolean
 ) {
 }
