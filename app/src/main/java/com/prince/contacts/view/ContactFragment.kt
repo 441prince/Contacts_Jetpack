@@ -59,6 +59,13 @@ class ContactFragment : Fragment(), ContactClickListener {
         // this creates a vertical layout Manager
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
+        /*// This will pass the ArrayList to our Adapter
+        val adapter = ContactAdapter(data)*/
+
+        initRecyclerView(contactDao)
+        // Setting the Adapter with the recyclerview
+        binding.recyclerview.adapter = adapter
+
         viewModel.getNavigateToNewActivity()?.observe(viewLifecycleOwner, Observer {
             // Navigate to the new activity
             // Create an Intent to start the new activity
@@ -81,14 +88,7 @@ class ContactFragment : Fragment(), ContactClickListener {
         // the image with the count of view
         for (i in 1..20) {
             data.add(Contact("8902975290", "Name $i " ,R.drawable.contactblack))
-        }
-
-        // This will pass the ArrayList to our Adapter
-        val adapter = ContactAdapter(data)*/
-
-        initRecyclerView(contactDao)
-        // Setting the Adapter with the recyclerview
-        binding.recyclerview.adapter = adapter
+        }*/
     }
 
     private fun initRecyclerView(contactDao: ContactDao) {

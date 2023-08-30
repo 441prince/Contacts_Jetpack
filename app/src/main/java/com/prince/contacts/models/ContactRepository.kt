@@ -1,6 +1,8 @@
 package com.prince.contacts.models
 
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.Flow
 
 class ContactRepository(private val contactDao: ContactDao) {
 
@@ -34,5 +36,9 @@ class ContactRepository(private val contactDao: ContactDao) {
         return contactDao.getContactByPhoneNumber(phoneNumber)
     }
 
-    val contacts = contactDao.getAllContact()
+    fun getFavoriteContacts(): LiveData<List<Contact>> {
+        return contactDao.getFavoriteContacts()
+    }
+
+    val contacts: Flow<List<Contact>> = contactDao.getAllContact()
 }

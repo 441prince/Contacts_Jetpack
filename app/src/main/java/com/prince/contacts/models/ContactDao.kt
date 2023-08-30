@@ -1,5 +1,6 @@
 package com.prince.contacts.models
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -14,6 +15,9 @@ interface ContactDao {
 
     @Query("SELECT * FROM contact_table WHERE contactNumber = :phoneNumber")
     suspend fun getContactByPhoneNumber(phoneNumber: String): Contact?
+
+    @Query("SELECT * FROM contact_table WHERE isFavorite = 1")
+    fun getFavoriteContacts(): LiveData<List<Contact>>
 
     @Insert
     suspend fun insertContact(contact: Contact)
