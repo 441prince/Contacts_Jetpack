@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -65,8 +66,6 @@ class ProfileFragment : Fragment(), ItemClickListener {
             // Navigate to the new activity
             // Create an Intent to start the new activity
             val intent = Intent(activity, AddViewEditProfileActivity::class.java)
-            // Optionally, add extra data
-            intent.putExtra("key", "value")
             // Start the new activity
             startActivity(intent)
 
@@ -98,10 +97,10 @@ class ProfileFragment : Fragment(), ItemClickListener {
 
         // Create an Intent to open the EditContactActivity
         val intent = Intent(requireContext(), AddViewEditProfileActivity::class.java)
-
         // Pass the contact data to the EditContactActivity
-        intent.putExtra("profile_id", profile.id)
 
+        intent.putExtra("profile_id", profile.id.toString())
+        //Toast.makeText(requireContext(), "${profile.id}", Toast.LENGTH_SHORT).show()
         // Start the EditContactActivity
         startActivity(intent)
     }

@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.prince.contacts.models.Contact
 import com.prince.contacts.R
 import com.prince.contacts.models.ContactDao
@@ -36,7 +37,12 @@ class FavoriteAdapter(
         // Load the image using Glide
         Glide.with(holder.itemView.context)
             .load(contact.imageUri) // Assuming contact.imageUri is a String
-            .centerCrop() // Center-crop the image within the circular frame
+            .apply(
+                RequestOptions()
+                    .placeholder(R.drawable.contactblack) // Set your default image resource here
+                    .error(R.drawable.contactblack) // Set your default image resource here as well
+                    .centerCrop()
+            )
             .into(holder.contactImageView)
 
         // sets the text to the textview from our itemHolder class

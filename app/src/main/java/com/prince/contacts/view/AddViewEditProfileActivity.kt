@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -38,6 +39,32 @@ class AddViewEditProfileActivity : AppCompatActivity() {
         binding.addViewEditProfileViewModel = viewModel
         binding.lifecycleOwner = this
 
+        // In the target activity where you want to retrieve the extra:
+        val extras = intent.extras
+        if (extras != null) {
+            val profileID = extras.getString("profile_id")?.toLong()
+            Toast.makeText(this, extras.getString("profile_id"), Toast.LENGTH_SHORT).show()
+            if (profileID != null) {
+                viewModel.displayProfile(profileID!!)
+                binding.AddContactSubmitButton.visibility = View.GONE
+                binding.EditOrUpdateProfileLayout.visibility = View.VISIBLE
+                binding.EditOrUpdateProfileSubmitButton.text = "Edit"
+                binding.editNameText.visibility = View.GONE
+                binding.ViewNameText.visibility = View.VISIBLE
+                binding.textView.visibility = View.GONE
+
+            } else {
+                binding.AddContactSubmitButton.visibility = View.VISIBLE
+                binding.EditOrUpdateProfileLayout.visibility = View.GONE
+
+                // Set a click listener for yourImageView to open the image picker
+            }
+        } else {
+            // Handle the case where the extra was not passed or is null.
+            binding.selectProfileImage.setOnClickListener {
+                checkPermissionAndPickImage()
+            }
+        }
         /*// Find the Toolbar in your layout
         val toolbar: Toolbar = findViewById(R.id.toolbar)*/
 
@@ -48,6 +75,16 @@ class AddViewEditProfileActivity : AppCompatActivity() {
         supportActionBar?.title = "Add New Profile" // Replace with your desired title
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Observe the selectedImageUri LiveData
+        viewModel.displayImageUri.observe(this, Observer { uri ->
+            uri?.let {
+                // Display the selected image using an ImageView or load it using Glide
+                Glide.with(this)
+                    .load(uri)
+                    .centerCrop() // Center-crop the image within the circular frame
+                    .into(binding.selectProfileImage)
+            }
+        })
 
         // Observe the selectedImageUri LiveData
         viewModel.selectedImageUri.observe(this, Observer { uri ->
@@ -56,14 +93,25 @@ class AddViewEditProfileActivity : AppCompatActivity() {
                 Glide.with(this)
                     .load(uri)
                     .centerCrop() // Center-crop the image within the circular frame
-                    .into(binding.selectContactImage)
+                    .into(binding.selectProfileImage)
             }
         })
-
-        // Set a click listener for yourImageView to open the image picker
-        binding.selectContactImage.setOnClickListener {
-            checkPermissionAndPickImage()
+        binding.EditOrUpdateProfileSubmitButton.setOnClickListener {
+            if(binding.EditOrUpdateProfileSubmitButton.text == "Edit") {
+                binding.EditOrUpdateProfileSubmitButton.text = "Update"
+                binding.textView.visibility = View.VISIBLE
+                binding.textView.text = "Click to Update Image"
+                binding.editNameText.visibility = View.VISIBLE
+                binding.ViewNameText.visibility = View.GONE
+                binding.selectProfileImage.setOnClickListener {
+                    checkPermissionAndPickImage()
+                }
+            } else {
+                viewModel.editOrUpdateProfileButton()
+            }
         }
+
+
 
         viewModel.errorMessage.observe(this, Observer { message ->
             if (!message.isNullOrEmpty()) {
@@ -190,7 +238,7 @@ class AddViewEditProfileActivity : AppCompatActivity() {
                     viewModel.selectedImageUri.value?.let { selectedImageUri ->
                         // You can use the selectedImageUri to display the captured image
                         // For example, with Glide or setImageURI on an ImageView
-                        binding.selectContactImage.setImageURI(selectedImageUri)
+                        binding.selectProfileImage.setImageURI(selectedImageUri)
                     }
                 }
             }

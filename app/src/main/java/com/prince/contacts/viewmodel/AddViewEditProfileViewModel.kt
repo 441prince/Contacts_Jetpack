@@ -39,6 +39,7 @@ class AddViewEditProfileViewModel(
     private val PICK_IMAGE = 1
     private val CAPTURE_IMAGE = 2
     private var profileId: Long = 0
+    private var isDefault: Boolean = false
 
 
     /*val inputPhoneNumber = MutableLiveData<String>()
@@ -76,7 +77,7 @@ class AddViewEditProfileViewModel(
     }
 
 
-    fun editOrUpdateButton() {
+    fun editOrUpdateProfileButton() {
         if (inputName.value != null) {
             if (selectedImageUri.value != null) {
                 displayImageUri.value = selectedImageUri.value.toString()
@@ -84,8 +85,8 @@ class AddViewEditProfileViewModel(
             val profile = Profile(
                 id = profileId,
                 name = inputName.value!!,
-                imageUri = displayImageUri.value!!, // Convert Uri to String
-                isDefault = false
+                imageUri = displayImageUri.value, // Convert Uri to String
+                isDefault = isDefault
             )
             updateProfile(profile)
             Log.d("AVEPVM editOrUpdateButton() if", "This is a debug message.$profileId")
@@ -112,14 +113,13 @@ class AddViewEditProfileViewModel(
 
     fun displayProfile(profileID: Long) = viewModelScope.launch {
         val profile = repository.getProfileById(profileID)
-        // Use 'contact' here
         if (profile != null) {
             profileId = profile.id
             displayName.value = profile.name
             displayImageUri.value = profile.imageUri
-
             inputName.value = profile.name
             displayImageUri.value = profile.imageUri
+            isDefault = profile.isDefault
 
         } else {
             // Handle the case where the contact with the provided phone number doesn't exist
