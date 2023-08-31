@@ -1,25 +1,30 @@
 package com.prince.contacts.view
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.prince.contacts.R
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.viewmodel.ContactViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ContactAdapter(
+    private val context: Context,
     private val contactsList: ArrayList<Contact>,
     private val clickListener: ContactClickListener,
-    private val contactDao: ContactDao
+    private val contactDao: ContactDao,
+    private val viewModel: ContactViewModel // Add ViewModel parameter
 ) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -92,14 +97,27 @@ class ContactAdapter(
                     val contact = contactsList[position]
                     contact.isFavorite = !contact.isFavorite // Toggle the favorite state
 
-                    // Use a coroutine scope to call the suspend function
+                    /*// Use a coroutine scope to call the suspend function
                     CoroutineScope(Dispatchers.IO).launch {
                         // Update the contact in the Room database
                         val repository = ContactRepository(contactDao) // Use your ContactRepository
                         repository.update(contact)
+
+                        // Notify the ViewModel which will, in turn, notify the LiveData
+                        viewModel.notifyRepositoryEvent(
+                            ContactRepository.RepositoryEvent(
+                                ContactRepository.RepositoryEvent.Action.NOTIFY_DATA_SET_CHANGED
+                            )
+                        )
                     }
 
-                    notifyDataSetChanged() // Refresh the list to update the ImageButton
+                    notifyDataSetChanged() // Refresh the list to update the ImageButton*/
+
+                    // Use ViewModel to update the contact and notify LiveData
+                    viewModel.updateContactAndNotify(contact)
+                    Toast.makeText(context, "ContactAdapter position $position", Toast.LENGTH_SHORT).show();
+
+                    // No need to call notifyDataSetChanged() here
                 }
             }
         }

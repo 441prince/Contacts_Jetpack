@@ -1,10 +1,13 @@
 package com.prince.contacts.view
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,6 +21,8 @@ import com.prince.contacts.models.ContactDatabase
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.viewmodel.ContactViewModel
 import com.prince.contacts.viewmodel.ContactViewModelFactory
+import com.prince.contacts.viewmodel.FavoriteViewModel
+import com.prince.contacts.viewmodel.FavoriteViewModelFactory
 
 class ContactFragment : Fragment(), ContactClickListener {
 
@@ -104,7 +109,7 @@ class ContactFragment : Fragment(), ContactClickListener {
             //viewModel.insertContact(Contact("8902975290", "Name $i " ,R.drawable.contactblack))
         }
 
-        adapter = ContactAdapter(data, this, contactDao)
+        adapter = ContactAdapter(requireContext(), data, this, contactDao, viewModel)
         binding.recyclerview.adapter = adapter
         displayContactList()
 

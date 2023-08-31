@@ -66,7 +66,7 @@ class FavoriteFragment : Fragment(), ContactClickListener {
         adapter = FavoriteAdapter(data, this, contactDao)
         binding.favoriteRecyclerView.adapter = adapter*/
 
-        adapter = FavoriteAdapter(ArrayList(), this, contactDao)
+        adapter = FavoriteAdapter(requireContext(), ArrayList(), this, contactDao, viewModel)
         binding.favoriteRecyclerView.adapter = adapter
 
 

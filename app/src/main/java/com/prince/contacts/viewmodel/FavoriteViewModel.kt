@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.prince.contacts.R
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FavoriteViewModel(private val repository: ContactRepository) : ViewModel() {
     // TODO: Implement the ViewModel
@@ -20,6 +22,22 @@ class FavoriteViewModel(private val repository: ContactRepository) : ViewModel()
     // Define a LiveData to trigger navigation
     private val navigateToNewActivity = MutableLiveData<Boolean>()
     private val favImageButton = MutableLiveData<Int>()
+    fun updateContactAndNotify(contact: Contact) {
+        viewModelScope.launch {
+            // Update the contact in the Room database
+            repository.update(contact)
+
+            /*// Notify the LiveData on the main thread
+            // Notify the LiveData on the main thread
+            withContext(Dispatchers.Main) {
+                notifyRepositoryEvent(
+                    ContactRepository.RepositoryEvent(
+                        ContactRepository.RepositoryEvent.Action.NOTIFY_DATA_SET_CHANGED
+                    )
+                )
+            }*/
+        }
+    }
 
     fun getNavigateToNewActivity(): LiveData<Boolean>? {
         return navigateToNewActivity
