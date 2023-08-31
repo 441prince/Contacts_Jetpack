@@ -40,6 +40,7 @@ class AddViewEditProfileViewModel(
     private val CAPTURE_IMAGE = 2
     private var profileId: Long = 0
     private var isDefault: Boolean = false
+    private var isSelected: Boolean = false
 
 
     /*val inputPhoneNumber = MutableLiveData<String>()
@@ -86,7 +87,8 @@ class AddViewEditProfileViewModel(
                 id = profileId,
                 name = inputName.value!!,
                 imageUri = displayImageUri.value, // Convert Uri to String
-                isDefault = isDefault
+                isDefault = isDefault,
+                isSelected = isSelected
             )
             updateProfile(profile)
             Log.d("AVEPVM editOrUpdateButton() if", "This is a debug message.$profileId")
@@ -102,7 +104,8 @@ class AddViewEditProfileViewModel(
                 id = 0,
                 name = inputName.value!!,
                 imageUri = selectedImageUri.value.toString(), // Convert Uri to String
-                isDefault = false
+                isDefault = false,
+                isSelected = false
             )
 
             insertProfile(profile)
@@ -120,6 +123,7 @@ class AddViewEditProfileViewModel(
             inputName.value = profile.name
             displayImageUri.value = profile.imageUri
             isDefault = profile.isDefault
+            isSelected = profile.isSelected
 
         } else {
             // Handle the case where the contact with the provided phone number doesn't exist

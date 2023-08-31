@@ -16,6 +16,9 @@ data class Profile(
     @ColumnInfo var imageUri: String?,
 
     @ColumnInfo(name = "isDefault")
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
+
+    @ColumnInfo(name = "isSelected")
+    var isSelected: Boolean = false
 )
 

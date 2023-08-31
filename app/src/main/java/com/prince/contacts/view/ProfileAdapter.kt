@@ -1,6 +1,8 @@
 package com.prince.contacts.view
 
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +10,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -21,8 +24,9 @@ class ProfileAdapter(
     private val profileList: ArrayList<Profile>,
     private val clickListener: ItemClickListener,
     private val profileDao: ProfileDao,
-    private val viewModel: ProfileViewModel // Add ViewModel parameter
+    private val viewModel: ProfileViewModel
 ) : RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -30,6 +34,7 @@ class ProfileAdapter(
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val profile = profileList[position]
         // sets the image to the imageview from our itemHolder class
@@ -51,6 +56,15 @@ class ProfileAdapter(
 
         // sets the text to the textview from our itemHolder class
         holder.profileNameTextView.text = profile.name
+
+        // Highlight the selected profile
+        if (profile.isSelected) {
+            //holder.itemView.setBackgroundResource(R.color.green) // Add a background resource for highlighting
+            //holder.profileImageView.outlineAmbientShadowColor = Color.parseColor("#81D4FA")
+            holder.itemView.setBackgroundResource(R.color.highlight_White) // Add a background resource for highlighting
+        } else {
+            holder.itemView.setBackgroundResource(0) // Clear background
+        }
     }
 
     override fun getItemCount(): Int {
@@ -68,7 +82,6 @@ class ProfileAdapter(
         val profileNameTextView: TextView = itemView.findViewById(R.id.profile_name_textView)
         // Add other views here as needed
 
-
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition
@@ -77,40 +90,17 @@ class ProfileAdapter(
                     clickListener.onProfileClick(profile)
                 }
             }
+
+            itemView.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val profile = profileList[position]
+                    clickListener.onProfileLongClick(profile)
+                    notifyDataSetChanged()
+
+                }
+                true
+            }
         }
     }
 }
-            /*contactFavoriteImageView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val contact = profileList[position]
-                    //contact.isFavorite = !contact.isFavorite // Toggle the favorite state
-
-                    *//*//*/ Use a coroutine scope to call the suspend function
-                    CoroutineScope(Dispatchers.IO).launch {
-                        // Update the contact in the Room database
-                        val repository = ContactRepository(contactDao) // Use your ContactRepository
-                        repository.update(contact)
-
-
-                        // Notify the ViewModel which will, in turn, notify the LiveData
-                        viewModel.notifyRepositoryEvent(
-                            ContactRepository.RepositoryEvent(
-                                ContactRepository.RepositoryEvent.Action.NOTIFY_DATA_SET_CHANGED
-                            )
-                        )
-                    }
-
-                    notifyDataSetChanged() // Refresh the list to update the ImageButton*//*
-
-                    // Use ViewModel to update the contact and notify LiveData
-                    //viewModel.updateContactAndNotify(contact)
-                    Toast.makeText(
-                        context,
-                        "FavoriteAdapter position $position",
-                        Toast.LENGTH_SHORT
-                    ).show();
-
-                    // No need to call notifyDataSetChanged() here
-                }
-            }*/

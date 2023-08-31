@@ -53,13 +53,14 @@ class ProfileFragment : Fragment(), ItemClickListener {
         binding.myViewModel = viewModel
         binding.lifecycleOwner = this
 
+        // this creates a vertical layout Manager
+        binding.profileRecyclerView.layoutManager = GridLayoutManager(context, 2)
+        initRecyclerView(profileDao)
+
         // Define your default profile
         val defaultProfile = Profile(id = 1, name = "Default Profile", isDefault = true, imageUri = null)
         viewModel.addDefaultProfile(defaultProfile)
 
-        // this creates a vertical layout Manager
-        binding.profileRecyclerView.layoutManager = GridLayoutManager(context, 2)
-        initRecyclerView(profileDao)
         displayContactList()
 
         viewModel.getNavigateToNewActivity()?.observe(viewLifecycleOwner, Observer {
@@ -69,6 +70,15 @@ class ProfileFragment : Fragment(), ItemClickListener {
             // Start the new activity
             startActivity(intent)
 
+        })
+
+        viewModel.selectedProfile.observe(viewLifecycleOwner, Observer { selectedProfile ->
+            // Handle the selected profile change here
+            if (selectedProfile != null) {
+                // A profile is selected, you can update your UI or perform actions accordingly
+            } else {
+                // No profile is selected, handle this case as needed
+            }
         })
 
         binding.floatingActionButton.setOnClickListener(View.OnClickListener { // Call the ViewModel method to handle the button click
@@ -103,6 +113,24 @@ class ProfileFragment : Fragment(), ItemClickListener {
         //Toast.makeText(requireContext(), "${profile.id}", Toast.LENGTH_SHORT).show()
         // Start the EditContactActivity
         startActivity(intent)
+    }
+
+    override fun onProfileLongClick(profile: Profile) {
+        // Implement actions for long-pressing a profile here
+        // For example, show a toast message or perform some other action
+
+        // Select the clicked profile
+        viewModel.selectProfile(profile.id)
+        adapter.notifyDataSetChanged()
+
+        // Implement other actions as needed
+
+        Toast.makeText(
+            requireContext(),
+            "Long-pressed profile: ${profile.name}",
+            Toast.LENGTH_SHORT
+        ).show()
+
     }
 
 }

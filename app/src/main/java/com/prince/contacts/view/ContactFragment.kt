@@ -132,4 +132,7 @@ class ContactFragment : Fragment(), ItemClickListener {
 
     override fun onProfileClick(profile: Profile) {
     }
+
+    override fun onProfileLongClick(profile: Profile) {
+    }
 }

@@ -32,6 +32,23 @@ class ProfileRepository(private val profileDao: ProfileDao) {
         val profiles = profileDao.getAllProfiles().firstOrNull()
         if (profiles == null || profiles.isEmpty()) {
             profileDao.insertDefaultProfileIfNotExists(profile)
+            profileDao.selectProfile(profile.id)
         }
+    }
+
+    suspend fun getSelectedProfile(): Profile? {
+        return profileDao.getSelectedProfile()
+    }
+
+    suspend fun deselectAllProfiles() {
+        profileDao.deselectAllProfiles()
+    }
+
+    suspend fun selectProfile(profileId: Long) {
+        // Deselect all profiles first
+        deselectAllProfiles()
+
+        // Select the specified profile
+        profileDao.selectProfile(profileId)
     }
 }

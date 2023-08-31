@@ -6,4 +6,5 @@ import com.prince.contacts.models.Profile
 interface ItemClickListener {
     fun onContactClick(contact: Contact)
     fun onProfileClick(profile: Profile)
+    fun onProfileLongClick(profile: Profile)
 }

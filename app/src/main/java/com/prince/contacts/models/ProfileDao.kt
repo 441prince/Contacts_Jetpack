@@ -16,6 +16,15 @@ interface ProfileDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertDefaultProfileIfNotExists(profile: Profile)
 
+    @Query("SELECT * FROM profile_table WHERE isSelected = 1")
+    suspend fun getSelectedProfile(): Profile?
+
+    @Query("UPDATE profile_table SET isSelected = 0")
+    suspend fun deselectAllProfiles()
+
+    @Query("UPDATE profile_table SET isSelected = 1 WHERE profileId = :profileId")
+    suspend fun selectProfile(profileId: Long)
+
     @Query("SELECT * FROM profile_table WHERE profileId = :profileId")
     suspend fun getProfileById(profileId: Long): Profile?
 
