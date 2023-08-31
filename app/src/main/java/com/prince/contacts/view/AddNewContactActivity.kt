@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
@@ -38,6 +40,17 @@ class AddNewContactActivity : AppCompatActivity() {
             ViewModelProvider(this, factory).get(AddNewContactViewModel::class.java)
         binding.addNewContactViewModel = addNewContactViewModel
         binding.lifecycleOwner = this
+
+        /*// Find the Toolbar in your layout
+        val toolbar: Toolbar = findViewById(R.id.toolbar)*/
+
+        // Set the Toolbar as the ActionBar
+        setSupportActionBar(binding.toolbar)
+
+        // Set the title for the ActionBar
+        supportActionBar?.title = "Add New Contact" // Replace with your desired title
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         // Observe the selectedImageUri LiveData
         addNewContactViewModel.selectedImageUri.observe(this, Observer { uri ->
@@ -77,6 +90,19 @@ class AddNewContactActivity : AppCompatActivity() {
         })
 
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                // Handle the up button click (e.g., navigate back)
+                onBackPressed()
+                return true
+            }
+            // Handle other menu items if needed
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
 
     private fun checkPermissionAndPickImage() {
         val cameraPermission = android.Manifest.permission.CAMERA

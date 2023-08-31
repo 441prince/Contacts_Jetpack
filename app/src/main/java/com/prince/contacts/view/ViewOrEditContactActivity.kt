@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.opengl.Visibility
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +54,19 @@ class ViewOrEditContactActivity : AppCompatActivity() {
         } else {
             // Handle the case where the extra was not passed or is null.
         }
+
+        // Set the Toolbar as the ActionBar
+        setSupportActionBar(binding.toolbar)
+
+        // Set the title for the ActionBar
+        supportActionBar?.title = "Contact Details" // Replace with your desired title
+
+        // Enable the up button
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        /*// Set the up button's color to white
+        val upArrow = ContextCompat.getDrawable(this, R.drawable.backbutton.)
+        supportActionBar?.setHomeAsUpIndicator(upArrow)*/
 
         // Observe the selectedImageUri LiveData
         viewOrEditContactViewModel.displayImageUri.observe(this, Observer { uri ->
@@ -126,10 +140,23 @@ class ViewOrEditContactActivity : AppCompatActivity() {
         binding.ViewNameText.visibility = View.GONE
 
         binding.EditOrUpdateContactSubmitButton.text = "Update"
+        supportActionBar?.title = "Edit Contact Details"
 
         // Set a click listener for yourImageView to open the image picker
         binding.ViewOrEditContactImage.setOnClickListener {
             checkPermissionAndPickImage()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                // Handle the up button click (e.g., navigate back)
+                onBackPressed()
+                return true
+            }
+            // Handle other menu items if needed
+            else -> return super.onOptionsItemSelected(item)
         }
     }
 
