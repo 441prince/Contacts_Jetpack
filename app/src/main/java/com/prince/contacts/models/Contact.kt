@@ -16,6 +16,7 @@ data class Contact(
     @ColumnInfo(name = "contactName") var name: String,
     @ColumnInfo(name = "contactEmailId") var emailId: String,
     @ColumnInfo var imageUri: String,
-    @ColumnInfo(name = "isFavorite") var isFavorite: Boolean
+    @ColumnInfo(name = "isFavorite") var isFavorite: Boolean,
+    @ColumnInfo(name = "profileId") val profileId: Long
 ) {
 }

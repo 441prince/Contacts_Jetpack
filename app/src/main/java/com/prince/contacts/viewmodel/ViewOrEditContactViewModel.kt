@@ -86,7 +86,8 @@ class ViewOrEditContactViewModel(
                 name = inputName.value!!,
                 emailId = inputEmailId.value!!,
                 imageUri = displayImageUri.value!!, // Convert Uri to String
-                isFavorite = false
+                isFavorite = false,
+                profileId = 1
             )
             updateContact(contact)
             Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")

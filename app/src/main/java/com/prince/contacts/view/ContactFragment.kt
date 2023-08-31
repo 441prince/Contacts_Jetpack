@@ -1,13 +1,10 @@
 package com.prince.contacts.view
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,14 +14,13 @@ import com.prince.contacts.R
 import com.prince.contacts.databinding.FragmentContactBinding
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
-import com.prince.contacts.models.ContactDatabase
+import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.Profile
 import com.prince.contacts.viewmodel.ContactViewModel
 import com.prince.contacts.viewmodel.ContactViewModelFactory
-import com.prince.contacts.viewmodel.FavoriteViewModel
-import com.prince.contacts.viewmodel.FavoriteViewModelFactory
 
-class ContactFragment : Fragment(), ContactClickListener {
+class ContactFragment : Fragment(), ItemClickListener {
 
     companion object {
         fun newInstance() = ContactFragment()
@@ -53,7 +49,7 @@ class ContactFragment : Fragment(), ContactClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val contactDao = ContactDatabase.getDatabase(requireContext()).ContactDao()
+        val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
         val repository = ContactRepository(contactDao)
         val factory = ContactViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory).get(ContactViewModel::class.java)
@@ -134,4 +130,6 @@ class ContactFragment : Fragment(), ContactClickListener {
         startActivity(intent)
     }
 
+    override fun onProfileClick(profile: Profile) {
+    }
 }

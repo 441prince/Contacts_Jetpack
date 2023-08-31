@@ -13,16 +13,12 @@ import com.bumptech.glide.Glide
 import com.prince.contacts.R
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
-import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.viewmodel.ContactViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ContactAdapter(
     private val context: Context,
     private val contactsList: ArrayList<Contact>,
-    private val clickListener: ContactClickListener,
+    private val clickListener: ItemClickListener,
     private val contactDao: ContactDao,
     private val viewModel: ContactViewModel // Add ViewModel parameter
 ) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {

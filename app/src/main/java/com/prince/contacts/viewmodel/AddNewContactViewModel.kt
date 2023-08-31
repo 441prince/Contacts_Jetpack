@@ -65,7 +65,8 @@ class AddNewContactViewModel(
                 name = inputName.value!!,
                 emailId = inputEmailId.value!!,
                 imageUri = selectedImageUri.value.toString(), // Convert Uri to String
-                isFavorite = false
+                isFavorite = false,
+                profileId = 1
             )
 
             insertContact(contact)

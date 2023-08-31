@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -19,7 +17,7 @@ import com.bumptech.glide.Glide
 import com.prince.contacts.MainActivity
 import com.prince.contacts.R
 import com.prince.contacts.databinding.ActivityAddNewContactBinding
-import com.prince.contacts.models.ContactDatabase
+import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.viewmodel.AddNewContactViewModel
 import com.prince.contacts.viewmodel.AddNewContactViewModelFactory
@@ -33,7 +31,7 @@ class AddNewContactActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_contact)
-        val dao = ContactDatabase.getDatabase(application).ContactDao()
+        val dao = AppDatabase.getDatabase(application).ContactDao()
         val repository = ContactRepository(dao)
         val factory = AddNewContactViewModelFactory(application, repository)
         addNewContactViewModel =

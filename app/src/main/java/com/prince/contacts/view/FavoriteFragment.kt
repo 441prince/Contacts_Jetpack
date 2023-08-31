@@ -14,12 +14,13 @@ import com.prince.contacts.R
 import com.prince.contacts.databinding.FragmentFavoriteBinding
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
-import com.prince.contacts.models.ContactDatabase
+import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.Profile
 import com.prince.contacts.viewmodel.FavoriteViewModel
 import com.prince.contacts.viewmodel.FavoriteViewModelFactory
 
-class FavoriteFragment : Fragment(), ContactClickListener {
+class FavoriteFragment : Fragment(), ItemClickListener {
 
     companion object {
         fun newInstance() = FavoriteFragment()
@@ -44,7 +45,7 @@ class FavoriteFragment : Fragment(), ContactClickListener {
         super.onActivityCreated(savedInstanceState)
 
 
-        val contactDao = ContactDatabase.getDatabase(requireContext()).ContactDao()
+        val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
         val repository = ContactRepository(contactDao)
         val factory = FavoriteViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
@@ -89,5 +90,9 @@ class FavoriteFragment : Fragment(), ContactClickListener {
 
         // Start the EditContactActivity
         startActivity(intent)
+    }
+
+    override fun onProfileClick(profile: Profile) {
+
     }
 }

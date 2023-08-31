@@ -40,5 +40,9 @@ class ContactRepository(private val contactDao: ContactDao) {
         return contactDao.getFavoriteContacts()
     }
 
+    fun getContactsForProfile(profileId: Long): LiveData<List<Contact>> {
+        return contactDao.getContactsForProfile(profileId)
+    }
+
     val contacts: Flow<List<Contact>> = contactDao.getAllContact()
 }

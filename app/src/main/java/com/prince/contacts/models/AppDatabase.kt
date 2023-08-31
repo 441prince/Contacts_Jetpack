@@ -5,23 +5,24 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Contact::class], version = 1)
-abstract class ContactDatabase : RoomDatabase() {
+@Database(entities = [Profile::class, Contact::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
     abstract fun ContactDao(): ContactDao
+    abstract fun ProfileDao(): ProfileDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the
         // same time.
         @Volatile
-        private var INSTANCE: ContactDatabase? = null
-        fun getDatabase(context: Context): ContactDatabase {
+        private var INSTANCE: AppDatabase? = null
+        fun getDatabase(context: Context): AppDatabase {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        ContactDatabase::class.java,
-                        "Contact Database"
+                        AppDatabase::class.java,
+                        "Contacts_App_Database"
                     ).build()
                 }
                 return instance
