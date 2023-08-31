@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.prince.contacts.R
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileDao
@@ -33,9 +34,19 @@ class ProfileAdapter(
         val profile = profileList[position]
         // sets the image to the imageview from our itemHolder class
         // Load the image using Glide
+       /* Glide.with(holder.itemView.context)
+            .load(profile.imageUri)
+            .centerCrop()
+            .into(holder.profileImageView)*/
+
         Glide.with(holder.itemView.context)
-            .load(profile.imageUri) // Assuming contact.imageUri is a String
-            .centerCrop() // Center-crop the image within the circular frame
+            .load(profile.imageUri)
+            .apply(
+                RequestOptions()
+                    .placeholder(R.drawable.contactblack) // Set your default image resource here
+                    .error(R.drawable.contactblack) // Set your default image resource here as well
+                    .centerCrop()
+            )
             .into(holder.profileImageView)
 
         // sets the text to the textview from our itemHolder class
@@ -53,8 +64,8 @@ class ProfileAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val profileImageView: ImageView = itemView.findViewById(R.id.contact_imageview)
-        val profileNameTextView: TextView = itemView.findViewById(R.id.contact_name_textView)
+        val profileImageView: ImageView = itemView.findViewById(R.id.profile_imageview)
+        val profileNameTextView: TextView = itemView.findViewById(R.id.profile_name_textView)
         // Add other views here as needed
 
 

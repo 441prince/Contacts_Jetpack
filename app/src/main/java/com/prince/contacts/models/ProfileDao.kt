@@ -12,6 +12,10 @@ interface ProfileDao {
     @Query("SELECT * FROM profile_table ORDER BY profileName ASC")
     fun getAllProfiles(): Flow<List<Profile>>
 
+    // Check if there are any profiles; if not, insert a default profile
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertDefaultProfileIfNotExists(profile: Profile)
+
     @Query("SELECT * FROM profile_table WHERE profileId = :profileId")
     suspend fun getProfileById(profileId: Long): Profile?
 
@@ -22,5 +26,5 @@ interface ProfileDao {
     suspend fun update(profile: Profile)
 
     @Query("DELETE FROM profile_table WHERE profileId = :profileId")
-    suspend fun delete(profileId: Long)
+    suspend fun deleteProfileById(profileId: Long)
 }

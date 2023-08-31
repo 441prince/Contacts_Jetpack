@@ -52,10 +52,29 @@ class ProfileFragment : Fragment(), ItemClickListener {
         binding.myViewModel = viewModel
         binding.lifecycleOwner = this
 
+        // Define your default profile
+        val defaultProfile = Profile(id = 1, name = "Default Profile", isDefault = true, imageUri = null)
+        viewModel.addDefaultProfile(defaultProfile)
+
         // this creates a vertical layout Manager
         binding.profileRecyclerView.layoutManager = GridLayoutManager(context, 2)
         initRecyclerView(profileDao)
         displayContactList()
+
+        viewModel.getNavigateToNewActivity()?.observe(viewLifecycleOwner, Observer {
+            // Navigate to the new activity
+            // Create an Intent to start the new activity
+            val intent = Intent(activity, AddViewEditProfileActivity::class.java)
+            // Optionally, add extra data
+            intent.putExtra("key", "value")
+            // Start the new activity
+            startActivity(intent)
+
+        })
+
+        binding.floatingActionButton.setOnClickListener(View.OnClickListener { // Call the ViewModel method to handle the button click
+            viewModel.onPlusButtonClick()
+        })
     }
 
     private fun initRecyclerView(profileDao: ProfileDao) {
@@ -78,7 +97,7 @@ class ProfileFragment : Fragment(), ItemClickListener {
     override fun onProfileClick(profile: Profile) {
 
         // Create an Intent to open the EditContactActivity
-        val intent = Intent(requireContext(), ViewOrEditContactActivity::class.java)
+        val intent = Intent(requireContext(), AddViewEditProfileActivity::class.java)
 
         // Pass the contact data to the EditContactActivity
         intent.putExtra("profile_id", profile.id)

@@ -13,7 +13,7 @@ data class Profile(
     @ColumnInfo(name = "profileName")
     val name: String,
 
-    @ColumnInfo var imageUri: String,
+    @ColumnInfo var imageUri: String?,
 
     @ColumnInfo(name = "isDefault")
     val isDefault: Boolean = false
