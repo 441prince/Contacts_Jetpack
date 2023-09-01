@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
@@ -72,17 +73,50 @@ class AddNewContactViewModel(
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun isValidPhoneNumber(phoneNumber: String): Boolean {
+        // Add your phone number validation logic here
+        // For example, you can use regular expressions to validate the format.
+        // For a simple example, let's assume a valid phone number has at least 10 digits.
+        return phoneNumber.length >= 10
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        // Add your email validation logic here
+        // You can use regular expressions to validate the email format.
+        // For a simple example, let's assume a valid email has an "@" character.
+        return email.contains("@")
+    }
+
     fun addContact() {
-        if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
+        val name = inputName.value?.trim()
+        val phoneNumber = inputPhoneNumber.value?.trim()
+        val email = inputEmailId.value?.trim()
+
+        if (name.isNullOrEmpty()) {
+            _errorMessage.value = "Name cannot be empty."
+            return
+        } else if (phoneNumber.isNullOrEmpty()) {
+            _errorMessage.value = "Phone number cannot be empty."
+            return
+        } else if (!isValidPhoneNumber(phoneNumber)) {  // Add more validation for phone number format if needed
+            _errorMessage.value = "Invalid phone number format."
+            return
+        } else if (email.isNullOrEmpty()) {
+            _errorMessage.value = "Email cannot be empty."
+            return
+        } else if (!isValidEmail(email)) {  // Add more validation for email format if needed
+            _errorMessage.value = "Invalid email format."
+            return
+        } else if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
 
             viewModelScope.launch {
                 val selectedProfile = withContext(Dispatchers.IO) {profileRepository.getSelectedProfile() }
                 val currentProfileId = selectedProfile.id
                 val contact = Contact(
                     id = 0,
-                    phoneNumber = inputPhoneNumber.value!!,
-                    name = inputName.value!!,
-                    emailId = inputEmailId.value!!,
+                    phoneNumber = phoneNumber,
+                    name = name,
+                    emailId = email,
                     imageUri = selectedImageUri.value.toString(), // Convert Uri to String
                     isFavorite = false,
                     profileId = currentProfileId
@@ -92,6 +126,8 @@ class AddNewContactViewModel(
             }
             // Perform some actions, and then trigger navigation
             navigateToAnotherActivity.value = true
+        } else {
+            Log.d("AddNewContactViewModel", "This is a debug message.")
         }
     }
 

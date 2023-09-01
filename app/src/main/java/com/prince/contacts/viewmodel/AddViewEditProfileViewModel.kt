@@ -82,13 +82,18 @@ class AddViewEditProfileViewModel(
 
 
     fun editOrUpdateProfileButton() {
-        if (inputName.value != null) {
+        val name = inputName.value?.trim()
+
+        if (name.isNullOrEmpty()) {
+            _errorMessage.value = "Name cannot be empty."
+            return
+        } else if (inputName.value != null) {
             if (selectedImageUri.value != null) {
                 displayImageUri.value = selectedImageUri.value.toString()
             }
             val profile = Profile(
                 id = profileId,
-                name = inputName.value!!,
+                name = name,
                 imageUri = displayImageUri.value, // Convert Uri to String
                 isDefault = isDefault,
                 isSelected = isSelected
@@ -102,10 +107,15 @@ class AddViewEditProfileViewModel(
     }
 
     fun addProfile() {
-        if (inputName.value != null) {
+        val name = inputName.value?.trim()
+
+        if (name.isNullOrEmpty()) {
+            _errorMessage.value = "Name cannot be empty."
+            return
+        } else if (inputName.value != null) {
             val profile = Profile(
                 id = 0,
-                name = inputName.value!!,
+                name = name,
                 imageUri = selectedImageUri.value.toString(), // Convert Uri to String
                 isDefault = false,
                 isSelected = false
