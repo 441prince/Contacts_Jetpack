@@ -20,6 +20,7 @@ import com.prince.contacts.models.ContactDao
 import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
+import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.FavoriteViewModel
 import com.prince.contacts.viewmodel.FavoriteViewModelFactory
 
@@ -54,7 +55,9 @@ class FavoriteFragment : Fragment(), ItemClickListener {
 
         val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
         val repository = ContactRepository(contactDao)
-        val factory = FavoriteViewModelFactory(repository)
+        val profileDao = AppDatabase.getDatabase(requireContext()).ProfileDao()
+        val profileRepository = ProfileRepository(profileDao)
+        val factory = FavoriteViewModelFactory(repository, profileRepository)
         viewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
         binding.myViewModel = viewModel
         binding.lifecycleOwner = this

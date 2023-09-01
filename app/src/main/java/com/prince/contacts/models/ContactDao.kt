@@ -19,8 +19,8 @@ interface ContactDao {
     @Query("SELECT * FROM contact_table WHERE contactNumber = :phoneNumber")
     suspend fun getContactByPhoneNumber(phoneNumber: String): Contact?
 
-    @Query("SELECT * FROM contact_table WHERE isFavorite = 1")
-    fun getFavoriteContacts(): LiveData<List<Contact>>
+    @Query("SELECT * FROM contact_table WHERE isFavorite = 1 AND profileId = :profileId ORDER BY contactName ASC")
+    fun getFavoriteContacts(profileId: Long): LiveData<List<Contact>>
 
     @Insert
     suspend fun insertContact(contact: Contact)
