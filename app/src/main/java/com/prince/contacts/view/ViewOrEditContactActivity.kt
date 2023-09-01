@@ -20,6 +20,7 @@ import com.prince.contacts.R
 import com.prince.contacts.databinding.ActivityViewOrEditContactBinding
 import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.ViewOrEditContactViewModel
 import com.prince.contacts.viewmodel.ViewOrEditContactViewModelFactory
 
@@ -34,9 +35,11 @@ class ViewOrEditContactActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_view_or_edit_contact)
 
-        val dao = AppDatabase.getDatabase(application).ContactDao()
-        val repository = ContactRepository(dao)
-        val factory = ViewOrEditContactViewModelFactory(application, repository)
+        val contactDao = AppDatabase.getDatabase(application).ContactDao()
+        val contactRepository = ContactRepository(contactDao)
+        val profileDao = AppDatabase.getDatabase(application).ProfileDao()
+        val profileRepository = ProfileRepository(profileDao)
+        val factory = ViewOrEditContactViewModelFactory(application, contactRepository, profileRepository)
         viewOrEditContactViewModel =
             ViewModelProvider(this, factory).get(ViewOrEditContactViewModel::class.java)
         binding.viewOrEditContactViewModel = viewOrEditContactViewModel

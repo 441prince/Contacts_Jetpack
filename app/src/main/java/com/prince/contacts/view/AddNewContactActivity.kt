@@ -32,11 +32,11 @@ class AddNewContactActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_contact)
-        val dao = AppDatabase.getDatabase(application).ContactDao()
-        val repository = ContactRepository(dao)
+        val contactDao = AppDatabase.getDatabase(application).ContactDao()
+        val contactRepository = ContactRepository(contactDao)
         val profileDao = AppDatabase.getDatabase(application).ProfileDao()
         val profileRepository = ProfileRepository(profileDao)
-        val factory = AddNewContactViewModelFactory(application, repository, profileRepository)
+        val factory = AddNewContactViewModelFactory(application, contactRepository , profileRepository)
         addNewContactViewModel =
             ViewModelProvider(this, factory).get(AddNewContactViewModel::class.java)
         binding.addNewContactViewModel = addNewContactViewModel
@@ -81,6 +81,7 @@ class AddNewContactActivity : AppCompatActivity() {
                 // Reset the LiveData value to prevent repeated navigation
                 addNewContactViewModel.navigateToAnotherActivity.value = false
 
+                //onBackPressed()
                 // Create an Intent to navigate to another activity
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)

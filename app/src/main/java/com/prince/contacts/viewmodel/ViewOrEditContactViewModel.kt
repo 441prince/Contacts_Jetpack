@@ -15,7 +15,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.ProfileRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -24,7 +27,8 @@ import java.util.Date
 
 class ViewOrEditContactViewModel(
     private val application: Application,
-    private val repository: ContactRepository
+    private val contactRepository: ContactRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     val inputName = MutableLiveData<String>()
@@ -48,12 +52,13 @@ class ViewOrEditContactViewModel(
     private var contactId: Long = 0
     private var profileId: Long = 0
     private var existingContact: Contact? = null
+    private var existingContactNumber: String? = null
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
             if (existingContact == null) {
                 // No duplicate found, you can proceed with the insertion.
-                repository.insert(contact)
+                contactRepository.insert(contact)
             } else {
                 // Duplicate contact found for the same profile, handle accordingly.
                 _errorMessage.postValue("Phone number already exists for this profile.")
@@ -67,9 +72,9 @@ class ViewOrEditContactViewModel(
     private fun updateContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            if (existingContact == null) {
+            if (existingContact == null || existingContactNumber == displayPhoneNumber.value) {
                 // No duplicate found, you can proceed with the insertion.
-                repository.update(contact)
+                contactRepository.update(contact)
             } else {
                 // Duplicate contact found for the same profile, handle accordingly.
                 _errorMessage.postValue("Phone number already exists for this profile.")
@@ -82,7 +87,7 @@ class ViewOrEditContactViewModel(
 
     fun deleteContact() = viewModelScope.launch {
         // Delete the contact using the contactId
-        repository.deleteContactById(contactId)
+        contactRepository.deleteContactById(contactId)
 
         // Optionally, navigate back to the previous screen or perform other actions as needed
         navigateToAnotherActivity.value = true
@@ -104,7 +109,8 @@ class ViewOrEditContactViewModel(
                     isFavorite = false,
                     profileId = profileId
                 )
-                existingContact = repository.getContactByPhoneNumberAndProfileId(inputPhoneNumber.value!!, profileId)
+                existingContact = contactRepository.getContactByPhoneNumberAndProfileId(inputPhoneNumber.value!!, profileId)
+                existingContactNumber = existingContact?.phoneNumber
                 updateContact(contact)
                 Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")
             }
@@ -115,7 +121,9 @@ class ViewOrEditContactViewModel(
     }
 
     fun displayContact(phoneNumber: String) = viewModelScope.launch {
-        val contact = repository.getContactByPhoneNumber(phoneNumber)
+        val selectedProfile = withContext(Dispatchers.IO) {profileRepository.getSelectedProfile() }
+        val currentProfileId = selectedProfile.id
+        val contact = contactRepository.getContactByPhoneNumberAndProfileId(phoneNumber, currentProfileId)
         // Use 'contact' here
         if (contact != null) {
             contactId = contact.id
@@ -230,12 +238,13 @@ class ViewOrEditContactViewModel(
 
 class ViewOrEditContactViewModelFactory(
     private val application: Application,
-    private val repository: ContactRepository
+    private val contactRepository: ContactRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ViewOrEditContactViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ViewOrEditContactViewModel(application, repository) as T
+            return ViewOrEditContactViewModel(application, contactRepository, profileRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
