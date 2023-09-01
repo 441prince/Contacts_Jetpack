@@ -13,8 +13,8 @@ interface ContactDao {
     @Query("SELECT * FROM contact_table ORDER BY contactName ASC")
     fun getAllContact(): Flow<List<Contact>>
 
-    @Query("SELECT * FROM contact_table WHERE profileId = :profileId")
-    fun getContactsForProfile(profileId: Long): LiveData<List<Contact>>
+    @Query("SELECT * FROM contact_table WHERE profileId = :profileId ORDER BY contactName ASC")
+    fun getAllContactByProfileId(profileId: Long): LiveData<List<Contact>>
 
     @Query("SELECT * FROM contact_table WHERE contactNumber = :phoneNumber")
     suspend fun getContactByPhoneNumber(phoneNumber: String): Contact?

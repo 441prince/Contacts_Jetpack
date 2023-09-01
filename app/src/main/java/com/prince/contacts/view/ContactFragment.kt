@@ -5,18 +5,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager.widget.ViewPager
+import com.bumptech.glide.Glide.init
 import com.prince.contacts.R
+import com.prince.contacts.ViewPagerAdapter
 import com.prince.contacts.databinding.FragmentContactBinding
+import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
-import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
+import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.ContactViewModel
 import com.prince.contacts.viewmodel.ContactViewModelFactory
 
@@ -29,6 +34,8 @@ class ContactFragment : Fragment(), ItemClickListener {
     private lateinit var viewModel: ContactViewModel
     private lateinit var binding: FragmentContactBinding
     private lateinit var adapter: ContactAdapter
+    private lateinit var viewPager: ViewPager
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     /*private val wordViewModel: ContactViewModel by viewModels {
         ContactViewModelFactory((getActivity().getApplicationContext() as ContactsApplication).repository)
@@ -49,10 +56,16 @@ class ContactFragment : Fragment(), ItemClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        viewPager = requireActivity().findViewById(R.id.viewPager) // Replace with your ViewPager ID
+        viewPagerAdapter = viewPager.adapter as ViewPagerAdapter
+
         val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
         val repository = ContactRepository(contactDao)
-        val factory = ContactViewModelFactory(repository)
+        val profileDao = AppDatabase.getDatabase(requireContext()).ProfileDao()
+        val profileRepository = ProfileRepository(profileDao)
+        val factory = ContactViewModelFactory(repository, profileRepository)
         viewModel = ViewModelProvider(this, factory).get(ContactViewModel::class.java)
+        //viewModel.getSelectedProfile()
         // TODO: Use the ViewModel
         binding.myViewModel = viewModel
         binding.lifecycleOwner = this
@@ -82,6 +95,38 @@ class ContactFragment : Fragment(), ItemClickListener {
             viewModel.onPlusButtonClick()
         })
 
+        /*viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                // This method is called when the page is scrolled.
+            }
+
+            override fun onPageSelected(position: Int) {
+
+                // This method is called when a new fragment becomes visible.
+                val selectedFragment = viewPagerAdapter.getItem(position)
+
+                if (selectedFragment is ContactFragment) {
+                    // It's a ContactFragment, so you can call the updateFragment method
+                    // This method is called when a new fragment becomes visible.
+                    //Toast.makeText(requireContext(), "onPageSelected in contactFragment", Toast.LENGTH_SHORT).show()
+                    // Take action when ContactFragment is selected
+                    //viewPager.adapter?.notifyDataSetChanged()
+
+                    //selectedFragment.recreateFragment()
+                    //refreshFragment()
+                }
+
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                // This method is called when the state of the scroll changes.
+            }
+        })*/
+
         /*// ArrayList of class ItemsViewModel
         val data = ArrayList<Contact>()
 
@@ -105,14 +150,23 @@ class ContactFragment : Fragment(), ItemClickListener {
             //viewModel.insertContact(Contact("8902975290", "Name $i " ,R.drawable.contactblack))
         }
 
-        adapter = ContactAdapter(requireContext(), data, this, contactDao, viewModel)
+        adapter = ContactAdapter(requireContext(), viewPager, data, this, contactDao, viewModel)
         binding.recyclerview.adapter = adapter
         displayContactList()
 
     }
 
     private fun displayContactList() {
-        viewModel.getAllContact().observe(viewLifecycleOwner, Observer {
+        /*viewModel.getAllContact().observe(viewLifecycleOwner, Observer {
+            adapter.setList(it)
+            adapter.notifyDataSetChanged()
+        })*/
+        /*viewModel.getAllContactOfProfile().observe(viewLifecycleOwner, Observer {
+            adapter.setList(it)
+            Toast.makeText(requireContext(), "getAllContactOfProfile()", Toast.LENGTH_SHORT).show()
+            adapter.notifyDataSetChanged()
+        })*/
+        viewModel.profileContacts.observe(viewLifecycleOwner, Observer {
             adapter.setList(it)
             adapter.notifyDataSetChanged()
         })
@@ -135,4 +189,35 @@ class ContactFragment : Fragment(), ItemClickListener {
 
     override fun onProfileLongClick(profile: Profile) {
     }
+
+    override fun onResume() {
+        super.onResume()
+        //Toast.makeText(requireContext(), "Im contactFragment", Toast.LENGTH_SHORT).show()
+    }
+
+    /*override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        if (isVisibleToUser) {
+            // Fragment is becoming visible, perform update actions here
+            Toast.makeText(requireContext(), "setUserVisibleHint in contactFragment", Toast.LENGTH_SHORT).show()
+            recreateFragment()
+        }
+    }*/
+
+    /*private fun recreateFragment() {
+        val fragmentManager = parentFragmentManager // If nested, use parentFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.detach(this)
+        fragmentTransaction.attach(this)
+        fragmentTransaction.commit()
+    }*/
+
+    /*private fun refreshFragment() {
+        // Replace the current fragment with a new instance
+        val transaction = requireFragmentManager().beginTransaction()
+        transaction.detach(this)
+        transaction.attach(this)
+        transaction.commit()
+    }*/
+
 }

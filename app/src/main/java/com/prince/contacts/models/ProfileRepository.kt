@@ -36,7 +36,7 @@ class ProfileRepository(private val profileDao: ProfileDao) {
         }
     }
 
-    suspend fun getSelectedProfile(): Profile? {
+    suspend fun getSelectedProfile(): Profile {
         return profileDao.getSelectedProfile()
     }
 

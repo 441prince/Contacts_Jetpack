@@ -17,7 +17,7 @@ interface ProfileDao {
     suspend fun insertDefaultProfileIfNotExists(profile: Profile)
 
     @Query("SELECT * FROM profile_table WHERE isSelected = 1")
-    suspend fun getSelectedProfile(): Profile?
+    fun getSelectedProfile(): Profile
 
     @Query("UPDATE profile_table SET isSelected = 0")
     suspend fun deselectAllProfiles()

@@ -62,7 +62,7 @@ class FavoriteViewModel(private val repository: ContactRepository) : ViewModel()
 
     fun getAllFavContact() = liveData {
         //insertContact(Contact(6, "123456", "Joel", R.drawable.filledheart))
-        repository.contacts.collect {
+        repository.allContacts.collect {
             emit(it)
         }
     }

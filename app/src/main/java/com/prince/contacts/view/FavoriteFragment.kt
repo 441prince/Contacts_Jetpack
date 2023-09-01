@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.prince.contacts.R
+import com.prince.contacts.ViewPagerAdapter
 import com.prince.contacts.databinding.FragmentFavoriteBinding
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactDao
@@ -29,6 +32,8 @@ class FavoriteFragment : Fragment(), ItemClickListener {
     private lateinit var viewModel: FavoriteViewModel
     private lateinit var binding: FragmentFavoriteBinding
     private lateinit var adapter: FavoriteAdapter
+    private lateinit var viewPager: ViewPager
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +49,8 @@ class FavoriteFragment : Fragment(), ItemClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        viewPager = requireActivity().findViewById(R.id.viewPager) // Replace with your ViewPager ID
+        viewPagerAdapter = viewPager.adapter as ViewPagerAdapter
 
         val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
         val repository = ContactRepository(contactDao)
@@ -67,7 +74,7 @@ class FavoriteFragment : Fragment(), ItemClickListener {
         adapter = FavoriteAdapter(data, this, contactDao)
         binding.favoriteRecyclerView.adapter = adapter*/
 
-        adapter = FavoriteAdapter(requireContext(), ArrayList(), this, contactDao, viewModel)
+        adapter = FavoriteAdapter(requireContext(), viewPager, ArrayList(), this, contactDao, viewModel)
         binding.favoriteRecyclerView.adapter = adapter
 
 
@@ -98,5 +105,10 @@ class FavoriteFragment : Fragment(), ItemClickListener {
 
     override fun onProfileLongClick(profile: Profile) {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //Toast.makeText(requireContext(), "Im FavoriteFragment", Toast.LENGTH_SHORT).show()
     }
 }

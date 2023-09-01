@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.Profile
+import com.prince.contacts.models.ProfileRepository
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -22,9 +24,11 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
+
 class AddNewContactViewModel(
     private val application: Application,
-    private val repository: ContactRepository
+    private val contactRepository: ContactRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     val inputName = MutableLiveData<String>()
@@ -42,7 +46,7 @@ class AddNewContactViewModel(
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            repository.insert(contact)
+            contactRepository.insert(contact)
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
             _errorMessage.postValue("Phone number already exists.") // Set your error message
@@ -59,17 +63,21 @@ class AddNewContactViewModel(
 
     fun addContact() {
         if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
-            val contact = Contact(
-                id = 0,
-                phoneNumber = inputPhoneNumber.value!!,
-                name = inputName.value!!,
-                emailId = inputEmailId.value!!,
-                imageUri = selectedImageUri.value.toString(), // Convert Uri to String
-                isFavorite = false,
-                profileId = 1
-            )
 
-            insertContact(contact)
+            viewModelScope.launch {
+                val selectedProfile = profileRepository.getSelectedProfile()
+                val currentProfileId = selectedProfile.id
+                val contact = Contact(
+                    id = 0,
+                    phoneNumber = inputPhoneNumber.value!!,
+                    name = inputName.value!!,
+                    emailId = inputEmailId.value!!,
+                    imageUri = selectedImageUri.value.toString(), // Convert Uri to String
+                    isFavorite = false,
+                    profileId = currentProfileId
+                )
+                insertContact(contact)
+            }
             // Perform some actions, and then trigger navigation
             navigateToAnotherActivity.value = true
         }
@@ -168,12 +176,13 @@ class AddNewContactViewModel(
 
 class AddNewContactViewModelFactory(
     private val application: Application,
-    private val repository: ContactRepository
+    private val contactRepository: ContactRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AddNewContactViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AddNewContactViewModel(application, repository) as T
+            return AddNewContactViewModel(application, contactRepository, profileRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

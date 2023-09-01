@@ -46,6 +46,7 @@ class ViewOrEditContactViewModel(
     private val PICK_IMAGE = 1
     private val CAPTURE_IMAGE = 2
     private var contactId: Long = 0
+    private var profileId: Long = 0
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
@@ -87,7 +88,7 @@ class ViewOrEditContactViewModel(
                 emailId = inputEmailId.value!!,
                 imageUri = displayImageUri.value!!, // Convert Uri to String
                 isFavorite = false,
-                profileId = 1
+                profileId = profileId
             )
             updateContact(contact)
             Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")
@@ -111,6 +112,7 @@ class ViewOrEditContactViewModel(
             inputEmailId.value = contact.emailId
             inputPhoneNumber.value = contact.phoneNumber
             displayImageUri.value = contact.imageUri
+            profileId = contact.profileId
 
         } else {
             // Handle the case where the contact with the provided phone number doesn't exist

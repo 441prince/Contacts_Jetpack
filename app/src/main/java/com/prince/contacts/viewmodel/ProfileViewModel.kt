@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import androidx.viewpager.widget.ViewPager
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileRepository
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
     }
 
     // Method to select a profile
-    fun selectProfile(profileId: Long) {
+    fun selectProfile(profileId: Long, viewPager: ViewPager) {
         viewModelScope.launch {
             /*// Deselect the currently selected profile (if any)
             _selectedProfile.value?.let {
@@ -42,6 +43,7 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
             repository.update(profile!!)*/
 
             repository.selectProfile(profileId)
+            viewPager.adapter?.notifyDataSetChanged()
         }
     }
 

@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.prince.contacts.R
@@ -21,6 +22,7 @@ import com.prince.contacts.viewmodel.ProfileViewModel
 
 class ProfileAdapter(
     val context: Context,
+    private val viewPager: ViewPager,
     private val profileList: ArrayList<Profile>,
     private val clickListener: ItemClickListener,
     private val profileDao: ProfileDao,
@@ -97,7 +99,7 @@ class ProfileAdapter(
                     val profile = profileList[position]
                     clickListener.onProfileLongClick(profile)
                     notifyDataSetChanged()
-
+                    //viewPager.adapter?.notifyDataSetChanged()
                 }
                 true
             }

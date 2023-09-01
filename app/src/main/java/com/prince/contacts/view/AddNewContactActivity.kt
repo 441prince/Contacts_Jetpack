@@ -19,6 +19,7 @@ import com.prince.contacts.R
 import com.prince.contacts.databinding.ActivityAddNewContactBinding
 import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.ContactRepository
+import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.AddNewContactViewModel
 import com.prince.contacts.viewmodel.AddNewContactViewModelFactory
 
@@ -33,7 +34,9 @@ class AddNewContactActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_contact)
         val dao = AppDatabase.getDatabase(application).ContactDao()
         val repository = ContactRepository(dao)
-        val factory = AddNewContactViewModelFactory(application, repository)
+        val profileDao = AppDatabase.getDatabase(application).ProfileDao()
+        val profileRepository = ProfileRepository(profileDao)
+        val factory = AddNewContactViewModelFactory(application, repository, profileRepository)
         addNewContactViewModel =
             ViewModelProvider(this, factory).get(AddNewContactViewModel::class.java)
         binding.addNewContactViewModel = addNewContactViewModel
@@ -73,8 +76,6 @@ class AddNewContactActivity : AppCompatActivity() {
             }
         })
 
-
-
         addNewContactViewModel.navigateToAnotherActivity.observe(this, Observer { shouldNavigate ->
             if (shouldNavigate) {
                 // Reset the LiveData value to prevent repeated navigation
@@ -86,7 +87,6 @@ class AddNewContactActivity : AppCompatActivity() {
                 finish()
             }
         })
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -100,7 +100,6 @@ class AddNewContactActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
 
     private fun checkPermissionAndPickImage() {
         val cameraPermission = android.Manifest.permission.CAMERA
@@ -152,7 +151,6 @@ class AddNewContactActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun openImagePicker() {
         val options = arrayOf("Camera", "Gallery", "Cancel")

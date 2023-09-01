@@ -10,8 +10,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.prince.contacts.R
+import com.prince.contacts.ViewPagerAdapter
 import com.prince.contacts.databinding.FragmentProfileBinding
 import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.Contact
@@ -30,6 +32,8 @@ class ProfileFragment : Fragment(), ItemClickListener {
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
     private lateinit var adapter: ProfileAdapter
+    private lateinit var viewPager: ViewPager
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +49,9 @@ class ProfileFragment : Fragment(), ItemClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        viewPager = requireActivity().findViewById(R.id.viewPager) // Replace with your ViewPager ID
+        viewPagerAdapter = viewPager.adapter as ViewPagerAdapter
+
         val profileDao = AppDatabase.getDatabase(requireContext()).ProfileDao()
         val repository = ProfileRepository(profileDao)
         val factory = ProfileViewModelFactory(repository)
@@ -54,7 +61,7 @@ class ProfileFragment : Fragment(), ItemClickListener {
         binding.lifecycleOwner = this
 
         // this creates a vertical layout Manager
-        binding.profileRecyclerView.layoutManager = GridLayoutManager(context, 2)
+        binding.profileRecyclerView.layoutManager = LinearLayoutManager(context)
         initRecyclerView(profileDao)
 
         // Define your default profile
@@ -87,8 +94,8 @@ class ProfileFragment : Fragment(), ItemClickListener {
     }
 
     private fun initRecyclerView(profileDao: ProfileDao) {
-        binding.profileRecyclerView.layoutManager = GridLayoutManager(context, 2)
-        adapter = ProfileAdapter(requireContext(), ArrayList(), this, profileDao, viewModel)
+        binding.profileRecyclerView.layoutManager = LinearLayoutManager(context)
+        adapter = ProfileAdapter(requireContext(), viewPager, ArrayList(), this, profileDao, viewModel)
         binding.profileRecyclerView.adapter = adapter
     }
 
@@ -120,17 +127,18 @@ class ProfileFragment : Fragment(), ItemClickListener {
         // For example, show a toast message or perform some other action
 
         // Select the clicked profile
-        viewModel.selectProfile(profile.id)
+        viewModel.selectProfile(profile.id ,viewPager)
         adapter.notifyDataSetChanged()
 
         // Implement other actions as needed
 
-        Toast.makeText(
-            requireContext(),
-            "Long-pressed profile: ${profile.name}",
-            Toast.LENGTH_SHORT
-        ).show()
+        //Toast.makeText(requireContext(), "Long-pressed profile: ${profile.name}", Toast.LENGTH_SHORT).show()
+        //viewPager.adapter?.notifyDataSetChanged()
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        //Toast.makeText(requireContext(), "Im ProfileFragment", Toast.LENGTH_SHORT).show()
+    }
 }

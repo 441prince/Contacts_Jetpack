@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.prince.contacts.models.Contact
@@ -18,6 +19,7 @@ import com.prince.contacts.viewmodel.FavoriteViewModel
 
 class FavoriteAdapter(
     private val context: Context,
+    private val viewPager: ViewPager,
     private val favoriteContactList: ArrayList<Contact>,
     private val clickListener: ItemClickListener,
     private val contactDao: ContactDao,
@@ -112,8 +114,9 @@ class FavoriteAdapter(
 
                     // Use ViewModel to update the contact and notify LiveData
                     viewModel.updateContactAndNotify(contact)
-                    Toast.makeText(context, "FavoriteAdapter position $position", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "FavoriteAdapter position $position", Toast.LENGTH_SHORT).show();
 
+                    viewPager.adapter?.notifyDataSetChanged()
                     // No need to call notifyDataSetChanged() here
                 }
             }

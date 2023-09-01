@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 
 class ViewPagerAdapter(supportFragmentManager: FragmentManager) :
-    FragmentStatePagerAdapter(supportFragmentManager) {
+    FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     // declare arrayList to contain fragments and its title
     private val mFragmentList = ArrayList<Fragment>()
@@ -30,5 +30,10 @@ class ViewPagerAdapter(supportFragmentManager: FragmentManager) :
         // add each fragment and its title to the array list
         mFragmentList.add(fragment)
         mFragmentTitleList.add(title)
+    }
+
+    override fun getItemPosition(`object`: Any): Int {
+        // Return POSITION_NONE to force fragments to be recreated when needed
+        return POSITION_NONE
     }
 }
