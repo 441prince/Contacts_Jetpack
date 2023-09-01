@@ -19,6 +19,7 @@ import com.prince.contacts.MainActivity
 import com.prince.contacts.R
 import com.prince.contacts.databinding.ActivityAddViewEditProfileBinding
 import com.prince.contacts.models.AppDatabase
+import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.AddViewEditProfileViewModel
 import com.prince.contacts.viewmodel.AddViewEditProfileViewModelFactory
@@ -32,9 +33,11 @@ class AddViewEditProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_view_edit_profile)
-        val dao = AppDatabase.getDatabase(application).ProfileDao()
-        val repository = ProfileRepository(dao)
-        val factory = AddViewEditProfileViewModelFactory(application, repository)
+        val profileDao = AppDatabase.getDatabase(application).ProfileDao()
+        val profileRepository = ProfileRepository(profileDao)
+        val contactDao = AppDatabase.getDatabase(application).ContactDao()
+        val contactRepository = ContactRepository(contactDao)
+        val factory = AddViewEditProfileViewModelFactory(application, profileRepository, contactRepository)
         viewModel = ViewModelProvider(this, factory).get(AddViewEditProfileViewModel::class.java)
         binding.addViewEditProfileViewModel = viewModel
         binding.lifecycleOwner = this
@@ -127,6 +130,7 @@ class AddViewEditProfileActivity : AppCompatActivity() {
                 // Reset the LiveData value to prevent repeated navigation
                 viewModel.navigateToAnotherActivity.value = false
 
+                //onBackPressed();
                 // Create an Intent to navigate to another activity
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)

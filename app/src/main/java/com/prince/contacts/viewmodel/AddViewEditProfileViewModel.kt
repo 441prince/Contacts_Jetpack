@@ -13,7 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.prince.contacts.models.Contact
+import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileRepository
 import kotlinx.coroutines.launch
@@ -25,7 +25,8 @@ import java.util.Date
 
 class AddViewEditProfileViewModel(
     private val application: Application,
-    private val repository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val contactRepository: ContactRepository
 ) : ViewModel() {
 
     val inputName = MutableLiveData<String>()
@@ -49,29 +50,31 @@ class AddViewEditProfileViewModel(
     val displayEmailId = MutableLiveData<String>()*/
 
 
-    fun insertProfile(profile: Profile) = viewModelScope.launch {
+    private fun insertProfile(profile: Profile) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            repository.insert(profile)
+            profileRepository.insert(profile)
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
-            _errorMessage.postValue("Profile name already exists.") // Set your error message
+            //Log.d("ADddViewEditProfileViewModelf", "Profile name already exists")
+            _errorMessage.postValue("Profile name already exists") // Set your error message
         }
     }
 
     private fun updateProfile(profile: Profile) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            repository.update(profile)
+            profileRepository.update(profile)
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
-            _errorMessage.postValue("Profile name already exists.") // Set your error message
+            _errorMessage.postValue("Profile name already exists") // Set your error message
         }
     }
 
     fun deleteProfile() = viewModelScope.launch {
         // Delete the contact using the contactId
-        repository.deleteProfileById(profileId)
+        profileRepository.deleteProfileById(profileId)
+        contactRepository.deleteContactsByProfileId(profileId)
 
         // Optionally, navigate back to the previous screen or perform other actions as needed
         navigateToAnotherActivity.value = true
@@ -115,7 +118,7 @@ class AddViewEditProfileViewModel(
     }
 
     fun displayProfile(profileID: Long) = viewModelScope.launch {
-        val profile = repository.getProfileById(profileID)
+        val profile = profileRepository.getProfileById(profileID)
         if (profile != null) {
             profileId = profile.id
             displayName.value = profile.name
@@ -224,12 +227,13 @@ class AddViewEditProfileViewModel(
 
 class AddViewEditProfileViewModelFactory(
     private val application: Application,
-    private val repository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val contactRepository: ContactRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AddViewEditProfileViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AddViewEditProfileViewModel(application, repository) as T
+            return AddViewEditProfileViewModel(application, profileRepository, contactRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

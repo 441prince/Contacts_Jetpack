@@ -31,6 +31,12 @@ class ContactRepository(private val contactDao: ContactDao) {
         contactDao.deleteContactById(contactId)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteContactsByProfileId(profileId: Long) {
+        contactDao.deleteContactsByProfileId(profileId)
+    }
+
     // Function to get a contact by phone number
     suspend fun getContactByPhoneNumber(phoneNumber: String): Contact? {
         return contactDao.getContactByPhoneNumber(phoneNumber)

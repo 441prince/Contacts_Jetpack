@@ -38,6 +38,9 @@ interface ContactDao {
     @Query("DELETE FROM contact_table WHERE contactId = :contactId")
     suspend fun deleteContactById(contactId: Long)
 
+    @Query("DELETE FROM contact_table WHERE profileId = :profileId")
+    suspend fun deleteContactsByProfileId(profileId: Long)
+
     @Query("DELETE FROM contact_table")
     suspend fun deleteAll()
 }

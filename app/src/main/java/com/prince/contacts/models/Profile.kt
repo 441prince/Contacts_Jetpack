@@ -2,9 +2,10 @@ package com.prince.contacts.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "profile_table")
+@Entity(tableName = "profile_table", indices = [Index(value = ["profileName"], unique = true)])
 data class Profile(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "profileId")

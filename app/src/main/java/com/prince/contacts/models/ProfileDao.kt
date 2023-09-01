@@ -28,10 +28,16 @@ interface ProfileDao {
     @Query("SELECT * FROM profile_table WHERE profileId = :profileId")
     suspend fun getProfileById(profileId: Long): Profile?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(profile: Profile)
 
-    @Update
+    //(onConflict = OnConflictStrategy.IGNORE)
+    /**
+     * It does not throw any sort of exception.
+     * It tries to process everything that the statement should affect.
+     */
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(profile: Profile)
 
     @Query("DELETE FROM profile_table WHERE profileId = :profileId")

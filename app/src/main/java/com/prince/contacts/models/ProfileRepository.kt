@@ -1,13 +1,12 @@
 package com.prince.contacts.models
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 
 class ProfileRepository(private val profileDao: ProfileDao) {
 
-    val allProfiles: Flow<List<Profile>> =  profileDao.getAllProfiles()
+    val allProfiles: Flow<List<Profile>> = profileDao.getAllProfiles()
 
     // Function to get a contact by phone number
     suspend fun getProfileById(profileId: Long): Profile? {

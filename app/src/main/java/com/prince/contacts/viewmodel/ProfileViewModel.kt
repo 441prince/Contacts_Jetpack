@@ -7,11 +7,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.viewpager.widget.ViewPager
+import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileRepository
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() {
+class ProfileViewModel(
+    private val profileRepository: ProfileRepository,
+    private val contactRepository: ContactRepository
+) : ViewModel() {
 
     // Define a LiveData to trigger navigation
     private val navigateToNewActivity = MutableLiveData<Boolean>()
@@ -20,7 +24,7 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
 
     fun getAllProfiles() = liveData {
         //insertContact(Contact(6, "123456", "Joel", R.drawable.filledheart))
-        repository.allProfiles.collect {
+        profileRepository.allProfiles.collect {
             emit(it)
         }
     }
@@ -42,26 +46,27 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
             // Update the database
             repository.update(profile!!)*/
 
-            repository.selectProfile(profileId)
+            profileRepository.selectProfile(profileId)
             viewPager.adapter?.notifyDataSetChanged()
         }
     }
 
     fun addDefaultProfile(defaultProfile: Profile) = viewModelScope.launch {
         // Ensure a default profile is available in the database
-        repository.checkAndInsertDefaultProfile(defaultProfile)
+        profileRepository.checkAndInsertDefaultProfile(defaultProfile)
     }
 
     suspend fun insert(profile: Profile) {
-        repository.insert(profile)
+        profileRepository.insert(profile)
     }
 
     suspend fun update(profile: Profile) {
-        repository.update(profile)
+        profileRepository.update(profile)
     }
 
     suspend fun delete(profileId: Long) {
-        repository.deleteProfileById(profileId)
+        profileRepository.deleteProfileById(profileId)
+        contactRepository.deleteContactsByProfileId(profileId)
     }
 
     fun getNavigateToNewActivity(): LiveData<Boolean>? {
@@ -74,13 +79,16 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
 
 }
 
-class ProfileViewModelFactory(private val repository: ProfileRepository) :
+class ProfileViewModelFactory(
+    private val profileRepository: ProfileRepository,
+    private val contactRepository: ContactRepository
+) :
     ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ProfileViewModel(repository) as T
+            return ProfileViewModel(profileRepository, contactRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.prince.contacts.ViewPagerAdapter
 import com.prince.contacts.databinding.FragmentProfileBinding
 import com.prince.contacts.models.AppDatabase
 import com.prince.contacts.models.Contact
+import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileDao
 import com.prince.contacts.models.ProfileRepository
@@ -53,8 +53,10 @@ class ProfileFragment : Fragment(), ItemClickListener {
         viewPagerAdapter = viewPager.adapter as ViewPagerAdapter
 
         val profileDao = AppDatabase.getDatabase(requireContext()).ProfileDao()
-        val repository = ProfileRepository(profileDao)
-        val factory = ProfileViewModelFactory(repository)
+        val profileRepository = ProfileRepository(profileDao)
+        val contactDao = AppDatabase.getDatabase(requireContext()).ContactDao()
+        val contactRepository = ContactRepository(contactDao)
+        val factory = ProfileViewModelFactory(profileRepository, contactRepository)
         viewModel = ViewModelProvider(this, factory).get(ProfileViewModel::class.java)
 
         binding.myViewModel = viewModel
