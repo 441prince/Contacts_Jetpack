@@ -35,6 +35,9 @@ class ContactRepository(private val contactDao: ContactDao) {
     suspend fun getContactByPhoneNumber(phoneNumber: String): Contact? {
         return contactDao.getContactByPhoneNumber(phoneNumber)
     }
+    suspend fun getContactByPhoneNumberAndProfileId(phoneNumber: String, profileId: Long): Contact? {
+        return contactDao.getContactByPhoneNumberAndProfileId(phoneNumber, profileId)
+    }
 
     fun getFavoriteContacts(profileId: Long): LiveData<List<Contact>> {
         return contactDao.getFavoriteContacts(profileId)

@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity
-    (tableName = "contact_table", indices = [Index(value = ["contactNumber"], unique = true)])
+    (tableName = "contact_table")
 data class Contact(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "contactId")
@@ -20,3 +20,6 @@ data class Contact(
     @ColumnInfo(name = "profileId") val profileId: Long
 ) {
 }
+
+
+//(tableName = "contact_table", indices = [Index(value = ["contactNumber"], unique = true)])

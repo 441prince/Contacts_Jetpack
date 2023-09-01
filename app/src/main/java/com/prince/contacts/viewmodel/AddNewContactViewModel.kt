@@ -17,7 +17,9 @@ import com.prince.contacts.models.Contact
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,10 +45,19 @@ class AddNewContactViewModel(
 
     private val PICK_IMAGE = 1
     private val CAPTURE_IMAGE = 2
+
+    private var existingContact: Contact? = null
+
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            contactRepository.insert(contact)
+            if (existingContact == null) {
+                // No duplicate found, you can proceed with the insertion.
+                contactRepository.insert(contact)
+            } else {
+                // Duplicate contact found for the same profile, handle accordingly.
+                _errorMessage.postValue("Phone number already exists for this profile.")
+            }
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
             _errorMessage.postValue("Phone number already exists.") // Set your error message
@@ -65,7 +76,7 @@ class AddNewContactViewModel(
         if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
 
             viewModelScope.launch {
-                val selectedProfile = profileRepository.getSelectedProfile()
+                val selectedProfile = withContext(Dispatchers.IO) {profileRepository.getSelectedProfile() }
                 val currentProfileId = selectedProfile.id
                 val contact = Contact(
                     id = 0,
@@ -76,6 +87,7 @@ class AddNewContactViewModel(
                     isFavorite = false,
                     profileId = currentProfileId
                 )
+                existingContact = contactRepository.getContactByPhoneNumberAndProfileId(inputPhoneNumber.value!!, currentProfileId)
                 insertContact(contact)
             }
             // Perform some actions, and then trigger navigation

@@ -47,10 +47,17 @@ class ViewOrEditContactViewModel(
     private val CAPTURE_IMAGE = 2
     private var contactId: Long = 0
     private var profileId: Long = 0
+    private var existingContact: Contact? = null
     fun insertContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            repository.insert(contact)
+            if (existingContact == null) {
+                // No duplicate found, you can proceed with the insertion.
+                repository.insert(contact)
+            } else {
+                // Duplicate contact found for the same profile, handle accordingly.
+                _errorMessage.postValue("Phone number already exists for this profile.")
+            }
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
             _errorMessage.postValue("Phone number already exists.") // Set your error message
@@ -60,7 +67,13 @@ class ViewOrEditContactViewModel(
     private fun updateContact(contact: Contact) = viewModelScope.launch {
         try {
             _errorMessage.value = null // Clear any previous error message
-            repository.update(contact)
+            if (existingContact == null) {
+                // No duplicate found, you can proceed with the insertion.
+                repository.update(contact)
+            } else {
+                // Duplicate contact found for the same profile, handle accordingly.
+                _errorMessage.postValue("Phone number already exists for this profile.")
+            }
         } catch (ex: SQLiteConstraintException) {
             // Handle the case of a duplicate phone number here
             _errorMessage.postValue("Phone number already exists.") // Set your error message
@@ -78,20 +91,23 @@ class ViewOrEditContactViewModel(
 
     fun editOrUpdateButton() {
         if (inputName.value != null && inputPhoneNumber.value != null && inputEmailId.value != null) {
-            if (selectedImageUri.value != null) {
-                displayImageUri.value = selectedImageUri.value.toString()
+            viewModelScope.launch {
+                if (selectedImageUri.value != null) {
+                    displayImageUri.value = selectedImageUri.value.toString()
+                }
+                val contact = Contact(
+                    id = contactId,
+                    phoneNumber = inputPhoneNumber.value!!,
+                    name = inputName.value!!,
+                    emailId = inputEmailId.value!!,
+                    imageUri = displayImageUri.value!!, // Convert Uri to String
+                    isFavorite = false,
+                    profileId = profileId
+                )
+                existingContact = repository.getContactByPhoneNumberAndProfileId(inputPhoneNumber.value!!, profileId)
+                updateContact(contact)
+                Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")
             }
-            val contact = Contact(
-                id = contactId,
-                phoneNumber = inputPhoneNumber.value!!,
-                name = inputName.value!!,
-                emailId = inputEmailId.value!!,
-                imageUri = displayImageUri.value!!, // Convert Uri to String
-                isFavorite = false,
-                profileId = profileId
-            )
-            updateContact(contact)
-            Log.d("VOECVM editOrUpdateButton() if", "This is a debug message.$contactId")
             navigateToAnotherActivity.value = true
         } else {
             Log.d("VOECVM editOrUpdateButton() else", "This is a debug message.$contactId")
