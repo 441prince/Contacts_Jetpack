@@ -8,8 +8,9 @@ import com.google.android.material.tabs.TabLayout
 import com.prince.contacts.view.ContactFragment
 import com.prince.contacts.view.FavoriteFragment
 import com.prince.contacts.view.ProfileFragment
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var pager: ViewPager // creating object of ViewPager

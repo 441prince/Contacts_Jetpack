@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -43,6 +44,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
@@ -60,6 +65,16 @@ dependencies {
     implementation ("androidx.room:room-ktx:2.5.2")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     kapt ("androidx.room:room-compiler:2.5.2")
+    implementation ("com.google.dagger:hilt-android:2.48")
+    kapt ("com.google.dagger:hilt-compiler:2.48")
+
+    // For instrumentation tests
+    androidTestImplementation  ("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest ("com.google.dagger:hilt-compiler:2.48")
+
+    // For local unit tests
+    testImplementation ("com.google.dagger:hilt-android-testing:2.48")
+    kaptTest ("com.google.dagger:hilt-compiler:2.48")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("junit:junit:4.13.2")

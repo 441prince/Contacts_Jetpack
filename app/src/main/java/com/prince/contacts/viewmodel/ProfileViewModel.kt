@@ -1,5 +1,6 @@
 package com.prince.contacts.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,9 +11,12 @@ import androidx.viewpager.widget.ViewPager
 import com.prince.contacts.models.ContactRepository
 import com.prince.contacts.models.Profile
 import com.prince.contacts.models.ProfileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val contactRepository: ContactRepository
 ) : ViewModel() {
@@ -31,6 +35,7 @@ class ProfileViewModel(
 
     // Method to select a profile
     fun selectProfile(profileId: Long, viewPager: ViewPager) {
+        Log.d("ProfileViewModel", "selectProfile called with profileId: $profileId")
         viewModelScope.launch {
             /*// Deselect the currently selected profile (if any)
             _selectedProfile.value?.let {
@@ -45,7 +50,7 @@ class ProfileViewModel(
 
             // Update the database
             repository.update(profile!!)*/
-
+            Log.d("ProfileViewModel", "inside: $profileId")
             profileRepository.selectProfile(profileId)
             viewPager.adapter?.notifyDataSetChanged()
         }

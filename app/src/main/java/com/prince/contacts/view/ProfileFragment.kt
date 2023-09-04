@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
@@ -23,12 +24,19 @@ import com.prince.contacts.models.ProfileDao
 import com.prince.contacts.models.ProfileRepository
 import com.prince.contacts.viewmodel.ProfileViewModel
 import com.prince.contacts.viewmodel.ProfileViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment(), ItemClickListener {
 
     companion object {
         fun newInstance() = ProfileFragment()
     }
+
+    //@Inject
+    //lateinit var viewModel: ProfileViewModel
+    //private val viewModel: ProfileViewModel by viewModels() //worked
 
     private lateinit var viewModel: ProfileViewModel
     private lateinit var binding: FragmentProfileBinding
@@ -88,8 +96,10 @@ class ProfileFragment : Fragment(), ItemClickListener {
             // Handle the selected profile change here
             if (selectedProfile != null) {
                 // A profile is selected, you can update your UI or perform actions accordingly
+                Toast.makeText(requireContext(), "Selected profile: ${selectedProfile.name}", Toast.LENGTH_SHORT).show()
             } else {
                 // No profile is selected, handle this case as needed
+                Toast.makeText(requireContext(), "No profile is selected", Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -153,8 +163,19 @@ class ProfileFragment : Fragment(), ItemClickListener {
         // Implement actions for long-pressing a profile here
         // For example, show a toast message or perform some other action
 
+        // Debug: Check if the ViewModel is initialized
+        if (viewModel == null) {
+            Toast.makeText(requireContext(), "ViewModel is null", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Debug: Check if the profile is not null
+        if (profile == null) {
+            Toast.makeText(requireContext(), "Selected profile is null", Toast.LENGTH_SHORT).show()
+            return
+        }
         // Select the clicked profile
-        viewModel.selectProfile(profile.id ,viewPager)
+        viewModel.selectProfile(profile.id, viewPager)
         adapter.notifyDataSetChanged()
 
         // Implement other actions as needed
