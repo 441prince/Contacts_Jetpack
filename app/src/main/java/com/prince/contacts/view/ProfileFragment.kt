@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +35,8 @@ class ProfileFragment : Fragment(), ItemClickListener {
     private lateinit var adapter: ProfileAdapter
     private lateinit var viewPager: ViewPager
     private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private var profileCount = 0
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,7 +94,13 @@ class ProfileFragment : Fragment(), ItemClickListener {
         })
 
         binding.floatingActionButton.setOnClickListener(View.OnClickListener { // Call the ViewModel method to handle the button click
-            viewModel.onPlusButtonClick()
+            if (profileCount < 3) {
+                // Call the ViewModel method to handle the button click
+                viewModel.onPlusButtonClick()
+            } else {
+                // Show a toast message when there are already three profiles
+                Toast.makeText(requireContext(), "Maximum of three profiles allowed.", Toast.LENGTH_SHORT).show()
+            }
         })
     }
 
@@ -102,11 +111,27 @@ class ProfileFragment : Fragment(), ItemClickListener {
     }
 
     private fun displayContactList() {
-        viewModel.getAllProfiles().observe(viewLifecycleOwner, Observer {
-            adapter.setList(it)
+        viewModel.getAllProfiles().observe(viewLifecycleOwner, Observer { profiles ->
+            // Update the profile count when the profile list changes
+            profileCount = profiles.size
+            // Disable the "Create Profile" button if there are already three profiles
+            updateCreateProfileButtonState()
+            adapter.setList(profiles)
             adapter.notifyDataSetChanged()
         })
     }
+
+    private fun updateCreateProfileButtonState() {
+        if (profileCount >= 3) {
+            // Disable the button if there are already three profiles
+            //binding.floatingActionButton.isEnabled = false
+        } else {
+            // Enable the button if there are fewer than three profiles
+            binding.floatingActionButton.isEnabled = true
+
+        }
+    }
+
 
     override fun onContactClick(contact: Contact) {
 
