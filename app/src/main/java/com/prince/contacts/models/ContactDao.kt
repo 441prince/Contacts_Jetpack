@@ -43,4 +43,7 @@ interface ContactDao {
 
     @Query("DELETE FROM contact_table")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM contact_table WHERE profileId = :profileId AND (contactNumber LIKE :query OR contactName LIKE :query)")
+    fun searchContactsByProfileId(profileId: Long, query: String): LiveData<List<Contact>>
 }

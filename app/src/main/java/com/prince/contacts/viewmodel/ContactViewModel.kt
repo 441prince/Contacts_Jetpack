@@ -26,11 +26,28 @@ class ContactViewModel(
     // Declare profileId as a MutableLiveData so you can update it
     private val profileId = MutableLiveData<Long>()
 
+    // Create a MutableLiveData to hold the search query
+    private val searchQuery = MutableLiveData<String>()
+
     // Observe profileId and update profileContacts using switchMap
     val profileContacts: LiveData<List<Contact>> = profileId.switchMap { id ->
         liveData {
             val contacts = contactRepository.getAllContactsByProfileId(id)
             emitSource(contacts)
+        }
+    }
+
+    // Observe searchQuery and update searchResults using switchMap
+    val searchResults: LiveData<List<Contact>> = searchQuery.switchMap { query ->
+        liveData {
+            // Get the current profile ID from profileId LiveData
+            val currentProfileId = profileId.value
+
+            if (currentProfileId != null) {
+                // Use the current profile ID and query to search for contacts
+                val results = contactRepository.searchContactsByProfileId(currentProfileId, query)
+                emitSource(results)
+            }
         }
     }
 
@@ -97,6 +114,11 @@ class ContactViewModel(
         contactRepository.allContacts.collect {
             emit(it)
         }
+    }
+
+    // Function to set the search query and trigger search
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
     }
 
     fun insertContact(contact: Contact) = viewModelScope.launch {

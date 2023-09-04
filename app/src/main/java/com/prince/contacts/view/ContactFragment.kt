@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -95,6 +96,19 @@ class ContactFragment : Fragment(), ItemClickListener {
             viewModel.onPlusButtonClick()
         })
 
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Handle search query submission if needed
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Handle search query text change
+                viewModel.setSearchQuery(newText.orEmpty()) // Pass the query to the ViewModel
+                return true
+            }
+        })
+
         /*viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
                 position: Int,
@@ -170,6 +184,13 @@ class ContactFragment : Fragment(), ItemClickListener {
             adapter.setList(it)
             adapter.notifyDataSetChanged()
         })
+
+        // Observe searchResults LiveData
+        viewModel.searchResults.observe(viewLifecycleOwner, Observer { searchResults ->
+            adapter.setList(searchResults)
+            adapter.notifyDataSetChanged()
+        })
+
     }
 
     override fun onContactClick(contact: Contact) {
